@@ -1,0 +1,16 @@
+{
+    "pride_and_prejudice.txt": {
+        "title": "Pride and Prejudice",
+        "author": "Jane Austen",
+        "publishing_year": "1870",
+        "publisher": "Bernhard Tauchnitz",
+        "link": "https://www.google.com/books/edition/Pride_and_Prejudice/tLfsSv69BxcC?hl=en&gbpv=0"
+    },
+    "jane_eyre.txt": {
+        "title": "Jane Eyre",
+        "author": "Charlotte Brontë",
+        "publishing_year": "1895",
+        "publisher": "Smith, Elder, & Company",
+        "link": "https://www.google.com/books/edition/Jane_Eyre/2O8mAQAAIAAJ?hl=en&gbpv=0"
+    }
+}

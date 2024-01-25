@@ -1,0 +1,6 @@
+this is the test file for the 1800s i want to see if we can remove punctuation
+and make the text lowercase too  that would be very helpful here is a list
+of things
+  a
+  b
+  c
