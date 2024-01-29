@@ -4,3 +4,17 @@ of things
   a
   b
   c
+
+ i also want to see if we can remove stopwords so heres some
+
+ i
+me
+my
+myself
+we
+our
+ours
+ourselves
+you
+your
+yours

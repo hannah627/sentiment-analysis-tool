@@ -4,17 +4,3 @@ of things:
  - A
  * B
  , C
-
- I also want to see if we can remove stopwords so heres some:
-
- i
-me
-my
-myself
-we
-our
-ours
-ourselves
-you
-your
-yours

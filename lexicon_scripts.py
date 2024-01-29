@@ -1,4 +1,6 @@
 import os
+from text_scripts import applyFunctionToAllFilesInDirectory
+from text_scripts import makeChangesToFileAndSaveToAnotherFile
 
 def checkLexiconForDuplicates():
      existing_terms = set()
@@ -17,5 +19,23 @@ def checkLexiconForDuplicates():
      else:
           print("Duplicate Terms in the Lexicon:")
           print(terms_with_duplicates)
+
+
+def applyLexiconToDirectory(directory):
+     resultsDirectory = directory + 'formatted_files_without_stopwords/'
+     applyFunctionToAllFilesInDirectory(directory, resultsDirectory, applyLexicon)
+
+
+def applyLexiconToFile(textFile, resultsFile):
+    makeChangesToFileAndSaveToAnotherFile(textFile, resultsFile, scoreWords)
+    # check if words before word in sentiment lexicon is 'not' - if so, flip sign? (multiply score by negative 1?)
+
+
+def scoreWords(text):
+    tokens = text.split(' ')
+    print(tokens)
+
+    results = ' '.join(tokens)
+    return results
 
 
