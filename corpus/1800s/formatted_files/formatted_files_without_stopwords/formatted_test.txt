@@ -1,1 +1,1 @@
-test file 1800s want see remove punctuation make text lowercase  would helpful list things     b   c   also want see remove stopwords heres  
+test file 1800s want remove punctuation make text lowercase helpful list things b c also want remove stopwords heres

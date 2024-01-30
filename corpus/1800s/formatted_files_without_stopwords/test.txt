@@ -1,6 +1,0 @@
-This is the Test File for the 1800s! I want to see if we can remove punctuation
-and make the text lowercase too - that would be very helpful. Here is a list
-of things:
- - A
- * B
- , C
