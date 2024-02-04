@@ -17,8 +17,12 @@ ask
 replied
 reply
 see
+saw
+hear
+heard
 came
 oh
+yes
 much
 every
 know
