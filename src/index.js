@@ -8,14 +8,46 @@ window.addEventListener("load", init);
 
 // the function that runs when the page loads;
 function init() {
-    id("input").addEventListener("input", test);
+    id("input").addEventListener("input", processInputtedText);
+    id("optionsSection").style.display = "none";
+    id("toggleOptionsSectionBtn").addEventListener("click", toggleOptionsSection)
 }
 
-function test() {
+function toggleOptionsSection() {
+    let optionsSection = id("optionsSection")
+    let arrowButton = id("arrowBtn");
+    // if (optionsSection.classList.contains(''))
+    if (optionsSection.style.display === "none") {
+        optionsSection.style.display = "block";
+        arrowButton.classList.remove('down');
+        arrowButton.classList.add('up')
+    } else {
+        optionsSection.style.display = "none";
+        arrowButton.classList.remove('up');
+        arrowButton.classList.add('down')
+    }
+}
+
+
+
+
+
+function processInputtedText() {
     let inputtedText = id("input").value;
-    id("result").textContent = inputtedText;
+    let formatted_text = lowerCaseAndRemovePunctuationOfText(inputtedText)
+    id("result").textContent = formatted_text;
 }
 
+function lowerCaseAndRemovePunctuationOfText(text) {
+    let lowerCaseText = text.toLowerCase();
+    let textWithoutPunctuation = lowerCaseText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    let textWithoutExtraSpaces = textWithoutPunctuation.replace(/\s{2,}/g," ");
+    return textWithoutExtraSpaces;
+}
+
+function removeStopWords(text) {
+
+}
 
 
 /**

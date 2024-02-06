@@ -18,12 +18,43 @@
         <main>
 
             <article>
+                <h2>What This Is</h2>
                 <p>An explanation of what this is and how it works</p>
 
+                <div id="optionsSectionHeader">
+                    <h2>Options</h2>
+                    <button id="toggleOptionsSectionBtn"><i id="arrowBtn" class="arrow down"></i></button> <!-- Show Options-->
+                </div>
+
+                <section id="optionsSection">
+                    <p>This is the options stuff hahah</p>
+                </section>
+
+                <!-- make dropdown for different options? -->
+                 <!-- allow options with stopwords and lexicon -->
+
+                 <!-- in stopwords column, allow to choose: -->
+                    <!-- default stopwords list -->
+                        <!-- might want "default for most text analyses" vs "default for sentiment analysis" -->
+                        <!-- with explanations of each - i.e. that for SA it removes more noun words -->
+                        <!-- might also want a tooltip or something to show what the default stopwords list includes -->
+                    <!-- default + custom -->
+                    <!-- just custom -->
+                        <!-- for last two, need a text input area to appear at that point, to allow them to input stopwords -->
+
+                 <!-- in lexicon options, allow users to choose: (probably gonna want a multi-select checkbox thing) -->
+                    <!-- AFINN english -->
+                    <!-- AFINN English + my historical lexicon -->
+                    <!-- both + custom -->
+                    <!-- etc for all combos -->
+                    <!-- gonna need a tooltip or something to show what words are in AFINN and my lexicon -->
+                    <!-- gonna need a way to let them input a custom lexicon / instructions on the format and checking of the formatting -->
+
+                <h2>Text Processing</h2>
                 <label for="input">Enter text below:</label>
                 <textarea id="input"></textarea>
 
-                <label for="result">Verdict:</label>
+                <label>Verdict:</label>
                 <div id="result"></div>
             </article>
 
