@@ -2,23 +2,24 @@ body {
     font-family: 'PT Sans', sans-serif;
     font-size: 16px;
     margin: 0;
-    /* padding-left: 5em;
-    padding-right: 5em; */
+    /* background-color: #FDFCDC; */
 }
 
 h1, h2, h3, h4, label {
     font-family: 'Montserrat', sans-serif;
 }
 
+h1, h2, h3 {
+    margin-bottom: 0px;
+}
+
 h1 {
     font-size: 3rem;
     margin-top: 0px;
-    margin-bottom: 0px;
 }
 
 h2 {
     font-size: 1.8rem;
-    margin-bottom: 0px;
 }
 
 h3 {
@@ -26,10 +27,15 @@ h3 {
 }
 
 header {
-    background-color: rgb(162, 226, 241);
+    /* background-color: #015F7C; */
+    background-color: #009BA3;
     /* padding-left: 14em; */
     padding-top: 0.5em;
     padding-bottom: 0.5em;
+}
+
+header h1 {
+    color: white;
 }
 
 main, header, article {
@@ -42,16 +48,24 @@ main, header {
 }
 
 article {
-    width: 60rem;
+    width: 80%;
+    margin-top: 2rem;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 5%;
+    /* background-color: #00AFB9;
+    color: white; */
 }
 
-label {
+.large-label {
     font-size: 1.2em;
 }
 
 textarea, #result {
     padding: 1em;
-    font-family: 'PT Sans', 'sans-serif'
+    font-family: 'PT Sans', 'sans-serif';
+    /* background-color:#81d0d4; */
+    /* background-color: #FED5AF; */
 }
 
 textarea {
@@ -60,11 +74,13 @@ textarea {
 }
 
 button {
-    /* border-radius: 80px; */
+    border-radius: 80px;
     /* background-color: rgb(162, 226, 241); */
+    /* background-color: #EE6258; */
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     border: none;
 }
-
 
 #result {
     margin: 0;
@@ -74,7 +90,7 @@ button {
 }
 
 
-#optionsSectionHeader {
+#optionsSectionHeader, #optionsSection {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -87,6 +103,8 @@ button {
 /* arrows - referenced https://www.w3schools.com/howto/howto_css_arrows.asp */
 .arrow {
     border: solid black;
+    /* border: solid #EE6258; */
+    /* border: solid white; */
     border-width: 0 3px 3px 0;
     display: inline-block;
     padding: 3px;
@@ -100,4 +118,13 @@ button {
 .down {
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
+}
+
+#optionsSection section {
+    display: flex;
+    flex-direction: column;
+}
+
+#customLexiconSection {
+    margin-top: 1rem;
 }

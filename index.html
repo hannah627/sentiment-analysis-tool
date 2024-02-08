@@ -27,40 +27,49 @@
                 </div>
 
                 <section id="optionsSection">
-                    <p>This is the options stuff hahah</p>
+                    <section>
+                        <h3>Stopwords</h3>
+
+                    </section>
+                    <section>
+                        <h3>Lexicon</h3>
+                        <p>Which lexicon(s) would you like to use?</p>
+
+                        <span>
+                            <input type="checkbox" id="lexicon1" name="lexicon" value="AFINN_en" checked>
+                            <label for="lexicon1">AFINN English</label>
+                        </span>
+                        <span>
+                            <input type="checkbox" id="lexicon2" name="lexicon" value="historical" checked>
+                            <label for="lexicon2">Historical Lexicon</label>
+                        </span>
+                        <span>
+                            <input type="checkbox" id="lexicon3" name="lexicon" value="custom">
+                            <label for="lexicon3">Custom Lexicon</label>
+                        </span>
+                        <section id="customLexiconSection">
+                            <label for="input">Enter custom lexicon below:</label>
+                            <textarea id="customLexiconInput"></textarea>
+                        </section>
+
+                    </section>
                 </section>
 
-                <!-- make dropdown for different options? -->
-                 <!-- allow options with stopwords and lexicon -->
-
-                 <!-- in stopwords column, allow to choose: -->
-                    <!-- default stopwords list -->
-                        <!-- might want "default for most text analyses" vs "default for sentiment analysis" -->
-                        <!-- with explanations of each - i.e. that for SA it removes more noun words -->
-                        <!-- might also want a tooltip or something to show what the default stopwords list includes -->
-                    <!-- default + custom -->
-                    <!-- just custom -->
-                        <!-- for last two, need a text input area to appear at that point, to allow them to input stopwords -->
-
-                 <!-- in lexicon options, allow users to choose: (probably gonna want a multi-select checkbox thing) -->
-                    <!-- AFINN english -->
-                    <!-- AFINN English + my historical lexicon -->
-                    <!-- both + custom -->
-                    <!-- etc for all combos -->
-                    <!-- gonna need a tooltip or something to show what words are in AFINN and my lexicon -->
-                    <!-- gonna need a way to let them input a custom lexicon / instructions on the format and checking of the formatting -->
-
                 <h2>Text Processing</h2>
-                <label for="input">Enter text below:</label>
+                <label class="large-label" for="input">Enter text below:</label>
                 <textarea id="input"></textarea>
 
-                <label>Verdict:</label>
+                <p>OR</p>
+                <input type="file" name="inputfile" id="inputfile">
+                <br>
+
+                <label class="large-label">Verdict:</label>
                 <div id="result"></div>
             </article>
 
         </main>
         <footer>
-
+            <p></p>
         </footer>
         <script src="src/index.js"></script>
     </body>
