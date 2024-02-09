@@ -125,6 +125,14 @@ button {
     flex-direction: column;
 }
 
+#stopwordsOptions, #lexiconOptions {
+    width: 45%
+}
+
+#lexiconOptions {
+    margin-right: 2%;
+}
+
 #customLexiconSection {
     margin-top: 1rem;
 }
