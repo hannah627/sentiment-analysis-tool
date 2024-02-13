@@ -5,11 +5,20 @@
 const AFINN_LINK = "lexicons/afinn-lexicon-en-165.txt";
 const HISTORICAL_LINK = "lexicons/lexicon-v1.txt";
 
+const NTLK_STOPWORDS_LINK = "stop_words_lists/ntlk_stop_words.txt";
+const TOOL_STOPWORDS_LINK = "stop_words_lists/custom_stop_words.txt";
+
 let AFINN_obj = {};
 let historicalLexiconObj = {};
 let customLexiconObj = {};
 
+let ntlkStopwordsList = [];
+let toolStopwordsList = [];
+let customStopwordsList = [];
+
+
 let currentLexicons = ['AFINN_en', 'historical'];
+let currentStopwords = ['ntlk', 'tool'];
 
 
 // when the page loads, call "init"
@@ -20,31 +29,28 @@ window.addEventListener("load", init);
 function init() {
 
     getFileLexicons(); // creates global JSON lexicon objects for the AFINN and historical lexicons
+    getFileStopWords();
 
     // hiding things that shouldn't be visible when the page loads
     id("optionsSection").style.display = "none";
     id("customLexiconSection").style.display = "none";
+    id("customStopwordsSection").style.display = "none";
 
     // adding general event listeners (options section button, main text input)
     id("toggleOptionsSectionBtn").addEventListener("click", toggleOptionsSectionVisibility);
     id("input").addEventListener("input", processInputtedText);
-    id("inputfile").addEventListener("change", processInputFile);
+    id("inputfile").addEventListener("change", processInputtedFile);
 
     // finding lexicon option checkboxes and adding event listeners to them
     let lexiconOptions = document.querySelectorAll('input[name=lexicon]');
     lexiconOptions.forEach((e) => e.addEventListener("change", updateSelectedLexicons));
-    id("lexicon3").addEventListener("change", toggleCustomLexiconAreaVisibility);
+
+    id("lexicon3").addEventListener("change", function() { toggleTextAreaVisibility("customLexiconSection"); });
+    id("stopwords2").addEventListener("change", function() { toggleTextAreaVisibility("customStopwordsSection"); });
 
 }
 
 
-function updateSelectedLexicons() {
-    let checkedBoxes = document.querySelectorAll('input[name=lexicon]:checked');
-    let selectedLexicons = [];
-    checkedBoxes.forEach((e) => selectedLexicons.push(e.value));
-
-    currentLexicons = selectedLexicons;
-}
 
 async function getFileLexicons() {
 // call this once when page loads; make JSON lexicons for both, then save those to variables
@@ -68,12 +74,31 @@ function processFileLexicon(lexicon, separator, lexiconObj) {
 }
 
 
-function toggleCustomLexiconAreaVisibility() {
-    let customLexiconSection = id("customLexiconSection");
-    if (customLexiconSection.style.display === "none") {
-        customLexiconSection.style.display = "flex";
+async function getFileStopWords() {
+    Promise.all([
+        fetch(NTLK_STOPWORDS_LINK).then(x => x.text()),
+        fetch(TOOL_STOPWORDS_LINK).then(x => x.text())
+    ]).then(([ntlk_stopwords, tool_stopwords]) => {
+        processFileStopwords(ntlk_stopwords, ntlkStopwordsList);
+        processFileStopwords(tool_stopwords, toolStopwordsList);
+    });
+}
+
+function processFileStopwords(list, resultList) {
+    let terms = list.split('\n');
+    terms.forEach((term) => {
+        resultList.push(term);
+    })
+}
+
+
+
+function toggleTextAreaVisibility(sectionID) {
+    let textAreaSection = id(sectionID);
+    if (textAreaSection.style.display === "none") {
+        textAreaSection.style.display = "flex";
     } else {
-        customLexiconSection.style.display = "none"
+        textAreaSection.style.display = "none"
     }
 }
 
@@ -97,20 +122,32 @@ function toggleOptionsSectionVisibility() {
 
 function processInputtedText() {
     let inputtedText = id("input").value;
-    let formatted_text = lowerCaseAndRemovePunctuationOfText(inputtedText);
-    let tokens = tokenizeText(formatted_text);
-    let lexicon = makeFullLexicon();
-    scoreText(tokens, lexicon);
+    processText(inputtedText);
 }
 
-function processInputFile() {
+function processInputtedFile() {
     let fr = new FileReader();
     fr.onload = function() {
-        let formatted_text = lowerCaseAndRemovePunctuationOfText(fr.result)
-        id("result").textContent = formatted_text;
+        let file_text = fr.result;
+        processText(file_text);
     }
     fr.readAsText(this.files[0]);
 }
+
+function processText(text) {
+    let formatted_text = lowerCaseAndRemovePunctuationOfText(text);
+    let tokens = tokenizeText(formatted_text);
+
+    let stopwordsList = makeFullStopwordsList();
+    let filteredTokens = removeStopWords(tokens, stopwordsList);
+
+    let lexicon = makeFullLexicon();
+    scoreText(filteredTokens, lexicon);
+}
+
+
+
+
 
 
 function lowerCaseAndRemovePunctuationOfText(text) {
@@ -128,8 +165,13 @@ function tokenizeText(text) {
     return clean_tokens;
 }
 
-function removeStopWords(text) {
 
+function updateSelectedLexicons() {
+    let checkedBoxes = document.querySelectorAll('input[name=lexicon]:checked');
+    let selectedLexicons = [];
+    checkedBoxes.forEach((e) => selectedLexicons.push(e.value));
+
+    currentLexicons = selectedLexicons;
 }
 
 function makeFullLexicon() { // does not yet include custom lexicon
@@ -140,10 +182,28 @@ function makeFullLexicon() { // does not yet include custom lexicon
     if (currentLexicons.includes('historical')) {
         fullLexicon = {...fullLexicon,  ...historicalLexiconObj};
     }
+    // something about what to do about custom lexicons
     return fullLexicon;
 }
 
 
+
+function makeFullStopwordsList() {
+    let fullStopwordsList = []
+    if (currentStopwords.includes('ntlk')) {
+        fullStopwordsList = fullStopwordsList.concat(ntlkStopwordsList);
+    }
+    if (currentStopwords.includes('tool')) {
+        fullStopwordsList = fullStopwordsList.concat(toolStopwordsList);
+    }
+    // something about what to do about custom stopwords lists
+    return fullStopwordsList;
+}
+
+function removeStopWords(tokens, stopwordsList) {
+    let filteredTokens = tokens.filter((token) => !stopwordsList.includes(token))
+    return filteredTokens
+}
 
 
 

@@ -29,6 +29,22 @@
                 <section id="optionsSection">
                     <section id="stopwordsOptions">
                         <h3>Stopwords</h3>
+                        <p>Which stopwords list(s) would you like to use?</p>
+                        <span>
+                            <input type="checkbox" id="stopwords1" name="stopwords" value="default" checked>
+                            <label for="stopwords1">Default</label>
+                        </span>
+                        <span>
+                            <input type="checkbox" id="stopwords2" name="stopwords" value="custom">
+                            <label for="stopwords2">Custom</label>
+                        </span>
+                        <section id="customStopwordsSection">
+                            <label for="customStopwordsInput">Enter custom stopwords list below:</label>
+                            <textarea id="customStopwordsInput"></textarea>
+                        </section>
+
+
+
 
                     </section>
                     <section id="lexiconOptions">
@@ -48,7 +64,7 @@
                             <label for="lexicon3">Custom Lexicon</label>
                         </span>
                         <section id="customLexiconSection">
-                            <label for="input">Enter custom lexicon below:</label>
+                            <label for="customLexiconInput">Enter custom lexicon below:</label>
                             <textarea id="customLexiconInput"></textarea>
                         </section>
 
