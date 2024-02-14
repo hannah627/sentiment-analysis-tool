@@ -2,7 +2,7 @@ body {
     font-family: 'PT Sans', sans-serif;
     font-size: 16px;
     margin: 0;
-    /* background-color: #FDFCDC; */
+    background-color: #F2E9E4;
 }
 
 h1, h2, h3, h4, label {
@@ -27,11 +27,11 @@ h3 {
 }
 
 header {
-    /* background-color: #015F7C; */
-    background-color: #009BA3;
+    /* background-color: #22223B; */
+    background-color: #4A4E69;
+    /* background-color: #009BA3; */
     /* padding-left: 14em; */
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    padding: 0.5em;
 }
 
 header h1 {
@@ -64,6 +64,7 @@ article {
 textarea, #result {
     padding: 1em;
     font-family: 'PT Sans', 'sans-serif';
+    background-color: #F2E9E4;
     /* background-color:#81d0d4; */
     /* background-color: #FED5AF; */
 }
@@ -78,6 +79,7 @@ button {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     border: none;
+    background-color: #C9ADA7;
 }
 
 #result {
@@ -88,9 +90,23 @@ button {
 }
 
 #explanationSection, #optionsSectionHeader, #optionsSection, #textProcessingSection {
-    background-color: rgb(234, 233, 233);
+    /* background-color: rgb(234, 233, 233); */
+    /* background-color: #C9ADA7; */
+    background-color: #D8C4C0;
     padding: 0.75rem;
+    /* border-radius: 15px; */
+}
+
+#explanationSection, #optionsSectionHeader, #textProcessingSection {
     border-radius: 15px;
+}
+
+/* #optionsSectionHeader {
+    border-radius: 15px 15px 0px 0px;
+} */
+
+#optionsSection {
+    border-radius: 0px 0px 15px 15px;
 }
 
 #optionsSection, #textProcessingSection {
@@ -162,6 +178,12 @@ input[type="file"] {
     padding-top: 0.75rem;
 }
 
-#result {
-    background-color: white;
+input::file-selector-button {
+    background-color: #4A4E69;
+    /* background-color: #9A8C98; */
+    font-size: 1rem;
+    font-family: 'PT Sans', sans-serif;
+    border: none;
+    border-radius: 15px;
+    color: white;
 }

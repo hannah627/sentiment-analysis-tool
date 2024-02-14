@@ -103,14 +103,22 @@ function toggleTextAreaVisibility(sectionID) {
 }
 
 function toggleOptionsSectionVisibility() {
-    let optionsSection = id("optionsSection")
+    let optionsSection = id("optionsSection");
+    let optionsSectionHeader = id("optionsSectionHeader");
     let arrowButton = id("arrowBtn");
+
     if (optionsSection.style.display === "none") {
+
         optionsSection.style.display = "flex";
+        optionsSectionHeader.style.borderRadius = "15px 15px 0px 0px";
         arrowButton.classList.remove('down');
         arrowButton.classList.add('up');
+
     } else {
+
         optionsSection.style.display = "none";
+        optionsSectionHeader.style.borderRadius = "15px";
+
         arrowButton.classList.remove('up');
         arrowButton.classList.add('down');
     }
