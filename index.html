@@ -18,8 +18,10 @@
         <main>
 
             <article>
-                <h2>What This Is</h2>
-                <p>An explanation of what this is and how it works</p>
+                <section id="explanationSection">
+                    <h2>What This Is</h2>
+                    <p>An explanation of what this is and how it works</p>
+                </section>
 
                 <div id="optionsSectionHeader">
                     <h2>Options</h2>
@@ -28,8 +30,9 @@
 
                 <section id="optionsSection">
                     <section id="stopwordsOptions">
-                        <h3>Stopwords</h3>
-                        <p>Which stopwords list(s) would you like to use?</p>
+                        <h3>Stop words</h3>
+                        <p>Stop words are words that are filtered out from a text or texts before processing so that they aren't included in the results of that processing </p>
+                        <p>Which stop words list(s) would you like to use?</p>
                         <span>
                             <input type="checkbox" id="stopwords1" name="stopwords" value="default" checked>
                             <label for="stopwords1">Default</label>
@@ -39,8 +42,11 @@
                             <label for="stopwords2">Custom</label>
                         </span>
                         <section id="customStopwordsSection">
-                            <label for="customStopwordsInput">Enter custom stopwords list below:</label>
+                            <label for="customStopwordsInput">Enter a custom stop words list below:</label>
                             <textarea id="customStopwordsInput"></textarea>
+
+                            <label for="customStopWordsFile">Or select a file containing your stop words list:</label>
+                            <input type="file" name="customStopWordsFile" id="customStopWordsFile">
                         </section>
 
 
@@ -64,23 +70,28 @@
                             <label for="lexicon3">Custom Lexicon</label>
                         </span>
                         <section id="customLexiconSection">
-                            <label for="customLexiconInput">Enter custom lexicon below:</label>
+                            <label for="customLexiconInput">Enter a custom lexicon below:</label>
                             <textarea id="customLexiconInput"></textarea>
+
+                            <label for="customLexiconFile">Or select a file containing your lexicon:</label>
+                            <input type="file" name="customLexiconFile" id="customLexiconFile">
                         </section>
 
                     </section>
                 </section>
 
-                <h2>Text Processing</h2>
-                <label class="large-label" for="input">Enter text below:</label>
-                <textarea id="input"></textarea>
+                <section id="textProcessingSection">
+                    <h2>Text Processing</h2>
+                    <label class="large-label" for="input">Enter text below:</label>
+                    <textarea id="input"></textarea>
 
-                <p>OR</p>
-                <input type="file" name="inputfile" id="inputfile" multiple>
-                <br>
+                    <label class="large-label" for="inputfile">Or select file(s):</label>
+                    <input type="file" name="inputfile" id="inputfile" multiple>
+                    <br>
 
-                <label class="large-label">Verdict:</label>
-                <div id="result"></div>
+                    <label class="large-label">Verdict:</label>
+                    <div id="result"></div>
+                </section>
             </article>
 
         </main>
