@@ -2,7 +2,7 @@ body {
     font-family: 'PT Sans', sans-serif;
     font-size: 16px;
     margin: 0;
-    background-color: #F2E9E4;
+    background-color: #F7FBDA;
 }
 
 h1, h2, h3, h4, label {
@@ -28,7 +28,7 @@ h3 {
 
 header {
     /* background-color: #22223B; */
-    background-color: #4A4E69;
+    background-color: #31572C;
     /* background-color: #009BA3; */
     /* padding-left: 14em; */
     padding: 0.5em;
@@ -53,8 +53,6 @@ article {
     padding-left: 5%;
     padding-right: 5%;
     padding-bottom: 5%;
-    /* background-color: #00AFB9;
-    color: white; */
 }
 
 .large-label {
@@ -64,9 +62,7 @@ article {
 textarea, #result {
     padding: 1em;
     font-family: 'PT Sans', 'sans-serif';
-    background-color: #F2E9E4;
-    /* background-color:#81d0d4; */
-    /* background-color: #FED5AF; */
+    background-color: #F7FBDA;
 }
 
 textarea {
@@ -79,7 +75,7 @@ button {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     border: none;
-    background-color: #C9ADA7;
+    background-color: #709041;
 }
 
 #result {
@@ -90,20 +86,14 @@ button {
 }
 
 #explanationSection, #optionsSectionHeader, #optionsSection, #textProcessingSection {
-    /* background-color: rgb(234, 233, 233); */
-    /* background-color: #C9ADA7; */
-    background-color: #D8C4C0;
+    /* background-color: #90A955; */
     padding: 0.75rem;
-    /* border-radius: 15px; */
+    background-color: #BECE7A;
 }
 
 #explanationSection, #optionsSectionHeader, #textProcessingSection {
     border-radius: 15px;
 }
-
-/* #optionsSectionHeader {
-    border-radius: 15px 15px 0px 0px;
-} */
 
 #optionsSection {
     border-radius: 0px 0px 15px 15px;
@@ -130,9 +120,9 @@ button {
 
 /* arrows - referenced https://www.w3schools.com/howto/howto_css_arrows.asp */
 .arrow {
-    border: solid black;
+    /* border: solid black; */
     /* border: solid #EE6258; */
-    /* border: solid white; */
+    border: solid white;
     border-width: 0 3px 3px 0;
     display: inline-block;
     padding: 3px;
@@ -179,11 +169,14 @@ input[type="file"] {
 }
 
 input::file-selector-button {
-    background-color: #4A4E69;
-    /* background-color: #9A8C98; */
+    background-color: #4F772D;
     font-size: 1rem;
     font-family: 'PT Sans', sans-serif;
     border: none;
     border-radius: 15px;
     color: white;
+}
+
+input:checked {
+    accent-color: #4F772D;
 }
