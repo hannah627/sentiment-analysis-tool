@@ -282,9 +282,6 @@ function appendTextElementToSection(element, parentElement, text) {
 function returnFullText(text, scoredWords) {
     let textSection = id("textResult");
     let textSectionContent = [];
-    // textSection.textContent = text;
-    // put scored tokens in a span tag with a certain class (like scoredToken or something)
-    // then use .scoredToken:hover in CSS
     // https://www.w3schools.com/css/css_tooltip.asp
     /*
     <div class="tooltip">the token in the normal text
@@ -292,42 +289,38 @@ function returnFullText(text, scoredWords) {
     </div>
     */
 
-    let currentScoredTextWordIndex = 0; // this currently gets reset every time something is typed - is that ok?
+    // let currentScoredTextWordIndex = 0; // this currently gets reset every time something is typed - is that ok?
+    // issue with "helpful" is that it has period at end in fulltext - need to strip punctuation?
+    // works to get helpful recognized, but then full text output is all lowercase and has no puncuation
+    // let formattedText = lowerCaseAndRemovePunctuationOfText(text);
+    // let fullTextTokens = tokenizeText(formattedText);
+
     let fullTextTokens = tokenizeText(text);
-    // we still need to go through the entire fulltext tokens, because we need to append each separately to the thing that will become the text content for the section - maybe an array, and we can join that into a string with spaces?
+
     for (let i = 0; i < fullTextTokens.length; i++) {
         let currentWord = fullTextTokens[i];
-        let currentWordToken = currentWord.toLowerCase();
+        console.log("current word = " + currentWord);
+        let toAppend = currentWord;
+        // let currentWordToken = currentWord.toLowerCase();
+        let currentWordToken = lowerCaseAndRemovePunctuationOfText(currentWord);
 
-        for (let j = currentScoredTextWordIndex; j < scoredWords.length; j++) {
+        // let j = currentScoredTextWordIndex
+        for (let j = 0; j < scoredWords.length; j++) {
             let currentToken = scoredWords[j][0];
+            console.log("current token = " +  currentToken)
 
             if (currentWordToken == currentToken) {
-                currentScoredTextWordIndex = j;
-                console.log(currentWord);
-                // apply stylings - make hoverable
+                console.log("entered if")
+                let score = scoredWords[j][1];
+                console.log()
+                // currentScoredTextWordIndex = j; // this is going to prevent us seeing helpful, b/c want is in there twice
+                toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
             }
         }
-        textSectionContent.push(currentWord);
+        textSectionContent.push(toAppend);
     }
-
-    textSection.textContent = textSectionContent.join(' ');
-
-    // for (let i = 0; i < scoredWords.length; i++) {
-    //     // start at index of current full text word, then start looking through those tokens (lowercased) until match, then update index
-    //     let currentToken = scoredWords[i][0];
-
-    //     for (let j = currentFullTextWordIndex; j < fullTextTokens.length; j++) {
-    //         let currentWord = fullTextTokens[j];
-    //         let currentWordToken = currentWord.toLowerCase();
-    //         if (currentWordToken == currentToken) {
-    //             currentFullTextWordIndex = j;
-    //             // apply stylings - make hoverable
-    //         }
-    //     }
-    // }
+    textSection.innerHTML = textSectionContent.join(' ');
 }
-
 
 
 
