@@ -59,7 +59,7 @@ article {
     font-size: 1.2em;
 }
 
-textarea, #result {
+textarea, #verdict, #textResult {
     padding: 1em;
     font-family: 'PT Sans', 'sans-serif';
     background-color: #F7FBDA;
@@ -78,7 +78,7 @@ button {
     background-color: #709041;
 }
 
-#result {
+#verdict, #textResult {
     margin: 0;
     border-width: 1px;
     border-style: solid;

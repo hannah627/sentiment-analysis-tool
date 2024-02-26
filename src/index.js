@@ -139,18 +139,21 @@ function processInputtedFile() {
         let file_text = fr.result;
         processText(file_text);
     }
-    fr.readAsText(this.files[0]);
+    fr.readAsText(this.files[0]); // currently only reads the first file we give it - fix!!
 }
 
 function processText(text) {
     let formatted_text = lowerCaseAndRemovePunctuationOfText(text);
     let tokens = tokenizeText(formatted_text);
+    let totalNumTokens = tokens.length; // for the verdict section
 
     let stopwordsList = makeFullStopwordsList();
     let filteredTokens = removeStopWords(tokens, stopwordsList);
 
     let lexicon = makeFullLexicon();
-    scoreText(filteredTokens, lexicon);
+    let [textScore, scoredWords] = scoreText(filteredTokens, lexicon);
+    appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens);
+    returnFullText(text, scoredWords);
 }
 
 
@@ -188,7 +191,7 @@ function makeFullLexicon() { // does not yet include custom lexicon
         fullLexicon = {...AFINN_obj};
     }
     if (currentLexicons.includes('historical')) {
-        fullLexicon = {...fullLexicon,  ...historicalLexiconObj};
+        fullLexicon = {...fullLexicon,  ...historicalLexiconObj}; // does this overwrite afinn entries? i hope so, but should test
     }
     // something about what to do about custom lexicons
     return fullLexicon;
@@ -218,7 +221,7 @@ function removeStopWords(tokens, stopwordsList) {
 function scoreText(tokens, lexicon) {
     let terms = Object.keys(lexicon);
     let textScore = 0;
-    let scoredWords = {};
+    let scoredWords = [];
 
     for (let i = 0; i < tokens.length; i++) {
         let token = tokens[i];
@@ -234,29 +237,35 @@ function scoreText(tokens, lexicon) {
             }
 
             textScore = textScore + score;
-            scoredWords[token] = score;
+            scoredWords.push([token, score]);
         }
     }
-    appendResultsToVerdictSection(textScore, scoredWords);
+    return [textScore, scoredWords];
 }
 
 
-function appendResultsToVerdictSection(textScore, scoredWords) {
-    let verdictSection = id("result");
-    let terms = Object.keys(scoredWords);
+// function displayResults? do this and also show full text
+function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
+    let verdictSection = id("verdict");
     verdictSection.textContent = ''; // reset the verdict section so we don't just keep adding paragraphs to it
 
-    if (terms.length > 0) {
+    if (scoredWords.length > 0) {
         appendTextElementToSection("p", verdictSection, "The overall score for this text was " + textScore + ".");
+        appendTextElementToSection("p", verdictSection, "The number of scored terms was " + scoredWords.length + ", out of a total of " + totalNumTokens + " tokens.");
         appendTextElementToSection("p", verdictSection, "The terms and their scores were:");
 
         let scoredWordsList = gen("ul");
         scoredWordsList.id = "scoredWordsList";
 
-        terms.forEach((word) => {
-            let sentence = word + ": " + scoredWords[word];
-            appendTextElementToSection("li", scoredWordsList, sentence)
+        scoredWords.forEach((entry) => {
+            let [token, score] = entry;
+            let sentence = token + ": " + score;
+            appendTextElementToSection("li", scoredWordsList, sentence);
         })
+
+        // will want to make this a table maybe?
+        // no, actually, want to highlight each word in the original text and show it's score, so we can also show which lexicon
+        // the score came from there
 
         verdictSection.appendChild(scoredWordsList);
     } else {
@@ -268,6 +277,55 @@ function appendTextElementToSection(element, parentElement, text) {
     let e = gen(element);
     e.textContent = text;
     parentElement.append(e);
+}
+
+function returnFullText(text, scoredWords) {
+    let textSection = id("textResult");
+    let textSectionContent = [];
+    // textSection.textContent = text;
+    // put scored tokens in a span tag with a certain class (like scoredToken or something)
+    // then use .scoredToken:hover in CSS
+    // https://www.w3schools.com/css/css_tooltip.asp
+    /*
+    <div class="tooltip">the token in the normal text
+        <span class="tooltiptext">Tooltip text (score and lexicon)</span>
+    </div>
+    */
+
+    let currentScoredTextWordIndex = 0; // this currently gets reset every time something is typed - is that ok?
+    let fullTextTokens = tokenizeText(text);
+    // we still need to go through the entire fulltext tokens, because we need to append each separately to the thing that will become the text content for the section - maybe an array, and we can join that into a string with spaces?
+    for (let i = 0; i < fullTextTokens.length; i++) {
+        let currentWord = fullTextTokens[i];
+        let currentWordToken = currentWord.toLowerCase();
+
+        for (let j = currentScoredTextWordIndex; j < scoredWords.length; j++) {
+            let currentToken = scoredWords[j][0];
+
+            if (currentWordToken == currentToken) {
+                currentScoredTextWordIndex = j;
+                console.log(currentWord);
+                // apply stylings - make hoverable
+            }
+        }
+        textSectionContent.push(currentWord);
+    }
+
+    textSection.textContent = textSectionContent.join(' ');
+
+    // for (let i = 0; i < scoredWords.length; i++) {
+    //     // start at index of current full text word, then start looking through those tokens (lowercased) until match, then update index
+    //     let currentToken = scoredWords[i][0];
+
+    //     for (let j = currentFullTextWordIndex; j < fullTextTokens.length; j++) {
+    //         let currentWord = fullTextTokens[j];
+    //         let currentWordToken = currentWord.toLowerCase();
+    //         if (currentWordToken == currentToken) {
+    //             currentFullTextWordIndex = j;
+    //             // apply stylings - make hoverable
+    //         }
+    //     }
+    // }
 }
 
 
