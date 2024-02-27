@@ -59,3 +59,4 @@ acknowledged 6
 aided 6
 mean -2
 bigotry -3
+solace 2

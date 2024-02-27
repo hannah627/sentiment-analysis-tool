@@ -182,7 +182,7 @@ input:checked {
 }
 
 .scoredWord {
-    color: red;
+    color: #DE0000;
     position: relative;
     display: inline-block;
     border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
@@ -205,6 +205,18 @@ input:checked {
     left: 50%;
     margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
 }
+
+/* creating the arrow at the bottom of the tooltip */
+.scoredWord .toolTipText::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+  }
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .scoredWord:hover .toolTipText {

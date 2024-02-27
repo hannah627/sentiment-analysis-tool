@@ -263,10 +263,6 @@ function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
             appendTextElementToSection("li", scoredWordsList, sentence);
         })
 
-        // will want to make this a table maybe?
-        // no, actually, want to highlight each word in the original text and show it's score, so we can also show which lexicon
-        // the score came from there
-
         verdictSection.appendChild(scoredWordsList);
     } else {
         appendTextElementToSection("p", verdictSection, "No words of the inputted text matched any terms in the currently selected lexicon(s), and thus, no words have been scored.");
@@ -282,39 +278,32 @@ function appendTextElementToSection(element, parentElement, text) {
 function returnFullText(text, scoredWords) {
     let textSection = id("textResult");
     let textSectionContent = [];
-    // https://www.w3schools.com/css/css_tooltip.asp
-    /*
-    <div class="tooltip">the token in the normal text
-        <span class="tooltiptext">Tooltip text (score and lexicon)</span>
-    </div>
-    */
-
-    // let currentScoredTextWordIndex = 0; // this currently gets reset every time something is typed - is that ok?
-    // issue with "helpful" is that it has period at end in fulltext - need to strip punctuation?
-    // works to get helpful recognized, but then full text output is all lowercase and has no puncuation
-    // let formattedText = lowerCaseAndRemovePunctuationOfText(text);
-    // let fullTextTokens = tokenizeText(formattedText);
-
     let fullTextTokens = tokenizeText(text);
 
     for (let i = 0; i < fullTextTokens.length; i++) {
         let currentWord = fullTextTokens[i];
-        console.log("current word = " + currentWord);
         let toAppend = currentWord;
-        // let currentWordToken = currentWord.toLowerCase();
         let currentWordToken = lowerCaseAndRemovePunctuationOfText(currentWord);
 
-        // let j = currentScoredTextWordIndex
-        for (let j = 0; j < scoredWords.length; j++) {
-            let currentToken = scoredWords[j][0];
-            console.log("current token = " +  currentToken)
+        if (scoredWords.length > 0) { // check b/c if we don't have any more words with scores, no point doing this
+            let currentToken = scoredWords[0][0]; // get the first part of the first line in scoredWords (b/c format is "word, 5")
 
-            if (currentWordToken == currentToken) {
-                console.log("entered if")
-                let score = scoredWords[j][1];
-                console.log()
-                // currentScoredTextWordIndex = j; // this is going to prevent us seeing helpful, b/c want is in there twice
+            if (currentToken.split(' ')[0] == "not") { // if token was 2 words, and the first is "not"
+                currentWordToken = "not " + currentWordToken;
+
+                if (currentWordToken == currentToken) {
+                    textSectionContent.pop(); // remove the last part of the textSectionContent array so that "not" isn't there twice
+                    scoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
+
+                    currentWord = fullTextTokens[i - 1] + " " + currentWord;
+                    let score = scoredWords[0][1];
+                    toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
+                }
+
+            } else if (currentWordToken == currentToken) { // going to be an issue with this check, because not want != want
+                let score = scoredWords[0][1];
                 toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
+                scoredWords.splice(0, 1); //should remove from scoredWords list; makes it faster?
             }
         }
         textSectionContent.push(toAppend);
