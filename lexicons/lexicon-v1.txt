@@ -60,3 +60,4 @@ aided 6
 mean -2
 bigotry -3
 solace 2
+tumult -2

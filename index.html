@@ -27,13 +27,14 @@
                     <p>An explanation of what this is and how it works</p>
                 </section>
 
-                <div id="optionsSectionHeader">
+
+                <section id="optionsSectionHeader">
                     <h2>Options</h2>
-                    <button id="toggleOptionsSectionBtn"><i id="arrowBtn" class="arrow down"></i></button> <!-- Show Options-->
-                </div>
+                    <button><i id="toggleOptionsSectionBtn" class="arrow down"></i></button>
+                </section>
 
                 <section id="optionsSection">
-                    <section id="stopwordsOptions">
+                    <section id="stopwordsOptions" class="subSection">
                         <h3>Stop words</h3>
                         <p>Stop words are words that are filtered out from a text or texts before processing so that they aren't included in the results of that processing </p>
                         <p>Which stop words list(s) would you like to use?</p>
@@ -53,7 +54,7 @@
                             <input type="file" name="customStopWordsFile" id="customStopWordsFile">
                         </section>
                     </section>
-                    <section id="lexiconOptions">
+                    <section id="lexiconOptions" class="subSection">
                         <h3>Lexicon</h3>
                         <p>Which lexicon(s) would you like to use?</p>
 
@@ -79,23 +80,59 @@
                     </section>
                 </section>
 
-                <section id="textProcessingSection">
-                    <h2>Text Processing</h2>
-                    <label class="large-label" for="input">Enter text below:</label>
-                    <textarea id="input"></textarea>
 
-                    <label class="large-label" for="inputfile">Or select file(s):</label>
-                    <input type="file" name="inputfile" id="inputfile" multiple>
-                    <br>
+                <section id="inputSection">
+                    <h2>Input</h2> <!-- Text Selection (?) -->
 
-                    <label class="large-label">Verdict:</label>
-                    <div id="verdict"></div>
+                    <section id="textInputSection" class="subSection">
+                        <label class="large-label" for="input">Enter text below:</label>
+                        <textarea id="input"></textarea>
+                    </section>
 
-                    <br>
-
-                    <label class="large-label">Full Text:</label>
-                    <div id="textResult"></div>
+                    <section id="fileSelectSection" class="subSection">
+                        <label class="large-label" for="inputFile">Or select file(s):</label>
+                        <input type="file" name="inputFile" id="inputFile" multiple>
+                    </section>
                 </section>
+
+
+                <section id="resultsSection">
+                    <h2>Results</h2>
+
+                    <div id="singleInputResults">
+                        <label class="large-label">Verdict:</label>
+                        <div id="verdict"></div>
+
+                        <table id="scoresTable">
+                            <colgroup span="3"></colgroup>
+                            <colgroup span="3"></colgroup>
+                            <tr>
+                                <th colspan="3" scope="colgroup">Positive Terms</th>
+                                <th colspan="3" scope="colgroup">Negative Terms</th>
+                            </tr>
+                            <tr>
+                                <th>Term</th>
+                                <th>Score</th>
+                                <th>Lexicon</th>
+
+                                <th>Term</th>
+                                <th>Score</th>
+                                <th>Lexicon</th>
+                            </tr>
+                        </table>
+
+                        <br>
+
+                        <label class="large-label">Full Text:</label>
+                        <div id="textResult"></div>
+
+                        <br>
+                    </div>
+
+                    <div id="multipleFilesResults"></div>
+                </section>
+
+
             </article>
 
         </main>
