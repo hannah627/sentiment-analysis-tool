@@ -38,12 +38,19 @@
                         <h3>Stop words</h3>
                         <p>Stop words are words that are filtered out from a text or texts before processing so that they aren't included in the results of that processing </p>
                         <p>Which stop words list(s) would you like to use?</p>
+                        <br>
                         <span>
-                            <input type="checkbox" id="stopwords1" name="stopwords" value="default" checked>
-                            <label for="stopwords1">Default</label>
+                            <input type="checkbox" id="stopwords1" name="stopwords" value="nltk" checked>
+                            <label for="stopwords1" class="toolTip">NLTK Stop Words
+                                <span class="toolTipText">NLTK stands for "Natural Language Tool Kit" </span>
+                            </label>
                         </span>
                         <span>
-                            <input type="checkbox" id="stopwords2" name="stopwords" value="custom">
+                            <input type="checkbox" id="stopwords2" name="stopwords" value="tool" checked>
+                            <label for="stopwords1">Tool's Stop Words</label>
+                        </span>
+                        <span>
+                            <input type="checkbox" id="stopwords3" name="stopwords" value="custom">
                             <label for="stopwords2">Custom</label>
                         </span>
                         <section id="customStopwordsSection">
@@ -60,11 +67,11 @@
 
                         <span>
                             <input type="checkbox" id="lexicon1" name="lexicon" value="AFINN_en" checked>
-                            <label for="lexicon1">AFINN English</label>
+                            <label for="lexicon1" class="toolTip">AFINN English<iframe src="lexicons/afinn-lexicon-en-165.txt" class="toolTipText"></iframe></label>
                         </span>
                         <span>
                             <input type="checkbox" id="lexicon2" name="lexicon" value="historical" checked>
-                            <label for="lexicon2">Historical Lexicon</label>
+                            <label for="lexicon2" class="toolTip">Historical Lexicon<iframe src="lexicons/lexicon-v1.txt" class="toolTipText"></iframe></label>
                         </span>
                         <span>
                             <input type="checkbox" id="lexicon3" name="lexicon" value="custom">
@@ -103,23 +110,34 @@
                         <label class="large-label">Verdict:</label>
                         <div id="verdict"></div>
 
-                        <table id="scoresTable">
-                            <colgroup span="3"></colgroup>
-                            <colgroup span="3"></colgroup>
-                            <tr>
-                                <th colspan="3" scope="colgroup">Positive Terms</th>
-                                <th colspan="3" scope="colgroup">Negative Terms</th>
-                            </tr>
-                            <tr>
-                                <th>Term</th>
-                                <th>Score</th>
-                                <th>Lexicon</th>
+                        <div id="tableContainer">
+                            <table id="scoresTable">
+                                <colgroup span="3"></colgroup>
+                                <colgroup span="3"></colgroup>
+                                <tr>
+                                    <th colspan="3" scope="colgroup" class="superColumnHeader">Positive Terms</th>
+                                    <th colspan="3" scope="colgroup" class="superColumnHeader">Negative Terms</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Term</th>
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Lexicon</th>
 
-                                <th>Term</th>
-                                <th>Score</th>
-                                <th>Lexicon</th>
-                            </tr>
-                        </table>
+                                    <th scope="col">Term</th>
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Lexicon</th>
+                                </tr>
+                                <tr>
+                                    <td>Test</td>
+                                    <td>Data</td>
+                                    <td></td>
+
+                                    <td>Testing</td>
+                                    <td>hello</td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
 
                         <br>
 

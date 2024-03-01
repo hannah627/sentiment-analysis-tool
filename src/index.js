@@ -5,20 +5,20 @@
 const AFINN_LINK = "lexicons/afinn-lexicon-en-165.txt";
 const HISTORICAL_LINK = "lexicons/lexicon-v1.txt";
 
-const NTLK_STOPWORDS_LINK = "stop_words_lists/ntlk_stop_words.txt";
+const NLTK_STOPWORDS_LINK = "stop_words_lists/nltk_stop_words.txt";
 const TOOL_STOPWORDS_LINK = "stop_words_lists/custom_stop_words.txt";
 
 let AFINN_obj = {};
 let historicalLexiconObj = {};
 let customLexiconObj = {};
 
-let ntlkStopwordsList = [];
+let nltkStopwordsList = [];
 let toolStopwordsList = [];
 let customStopwordsList = [];
 
 
 let currentLexicons = ['AFINN_en', 'historical'];
-let currentStopwords = ['ntlk', 'tool'];
+let currentStopwords = ['nltk', 'tool'];
 
 
 // when the page loads, call "init"
@@ -36,7 +36,7 @@ function init() {
     id("customLexiconSection").style.display = "none";
     id("customStopwordsSection").style.display = "none";
     id("singleInputResults").style.display = "none";
-    id("scoresTable").style.display = "none";
+    id("tableContainer").style.display = "none";
 
     // adding general event listeners (options section button, main text input)
     id("optionsSectionHeader").addEventListener("click", () =>
@@ -49,7 +49,7 @@ function init() {
     lexiconOptions.forEach((e) => e.addEventListener("change", updateSelectedLexicons));
 
     id("lexicon3").addEventListener("change", function() { toggleElementVisibility("customLexiconSection", "flex"); });
-    id("stopwords2").addEventListener("change", function() { toggleElementVisibility("customStopwordsSection", "flex"); });
+    id("stopwords3").addEventListener("change", function() { toggleElementVisibility("customStopwordsSection", "flex"); });
 
 }
 
@@ -79,10 +79,10 @@ function processFileLexicon(lexicon, separator, lexiconObj) {
 
 async function getFileStopWords() {
     Promise.all([
-        fetch(NTLK_STOPWORDS_LINK).then(x => x.text()),
+        fetch(NLTK_STOPWORDS_LINK).then(x => x.text()),
         fetch(TOOL_STOPWORDS_LINK).then(x => x.text())
-    ]).then(([ntlk_stopwords, tool_stopwords]) => {
-        processFileStopwords(ntlk_stopwords, ntlkStopwordsList);
+    ]).then(([nltk_stopwords, tool_stopwords]) => {
+        processFileStopwords(nltk_stopwords, nltkStopwordsList);
         processFileStopwords(tool_stopwords, toolStopwordsList);
     });
 }
@@ -294,8 +294,8 @@ function makeFullLexicon() { // does not yet include custom lexicon
 
 function makeFullStopwordsList() {
     let fullStopwordsList = []
-    if (currentStopwords.includes('ntlk')) {
-        fullStopwordsList = fullStopwordsList.concat(ntlkStopwordsList);
+    if (currentStopwords.includes('nltk')) {
+        fullStopwordsList = fullStopwordsList.concat(nltkStopwordsList);
     }
     if (currentStopwords.includes('tool')) {
         fullStopwordsList = fullStopwordsList.concat(toolStopwordsList);
@@ -341,9 +341,9 @@ function scoreText(tokens, lexicon) {
 function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
     // doing this to prevent table from being destroyed if multiple inputs happen before refresh
     let resultsSection = id("resultsSection");
-    let table = id("scoresTable");
-    table.style.display = "none";
-    resultsSection.appendChild(table);
+    let tableContainer = id("tableContainer");
+    tableContainer.style.display = "none";
+    resultsSection.appendChild(tableContainer);
 
     let verdictSection = id("verdict");
     verdictSection.textContent = ''; // reset the verdict section so we don't just keep adding paragraphs to it
@@ -381,8 +381,8 @@ function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
 
         verdictSection.appendChild(listContainer);
 
-        verdictSection.appendChild(table);
-        table.style.display = "block";
+        verdictSection.appendChild(tableContainer);
+        tableContainer.style.display = "flex";
     } else {
         appendTextElementToSection("p", verdictSection, "No words of the inputted text matched any terms in the currently selected lexicon(s), and thus, no words have been scored.");
     }
@@ -410,25 +410,22 @@ function makeScoresList(type) {
     return WordsListContainer;
 }
 
-function makeScoresTable(scoredWords){
-    // stop this, just have table in HTML and unhide it as needed, then add rows as needed
-    // but then we'd have issues with "appendChild" earlier on, because then the table will be at the top
-
-
-    let table = gen("table");
-    table.appendChild("<colgroup span='3'></colgroup>"); // doesnt work
-    table.appendChild("<colgroup span='3'></colgroup>");
-    let headerRow = gen("tr");
-    let typeHeader = gen("th");
-    typeHeader.colspan = "3";
-    typeHeader.scope="colgroup";
-    typeHeader.textContent = "Positive Terms";
-
-    headerRow.appendChild(typeHeader);
-
-
-
+function addRowsToTable(positiveWordsList, negativeWordsList, tableID) {
+    let table = id(tableID)
+    let numRows = Math.max(positiveWordsList.length, negativeWordsList.length);
+    for (let i = 0; i < numRows; i++) {
+        let rowContainer = gen("tr");
+        console.log(positiveWordsList[i]);
+        console.log(negativeWordsList[i]);
+    }
 }
+
+function createTableCells() {
+    // take positive or negative
+    // create 3 table cells, with term score lexicon
+}
+
+
 
 
 function returnFullText(text, textSection, scoredWords) {

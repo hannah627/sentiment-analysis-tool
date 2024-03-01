@@ -1,13 +1,22 @@
 /* colors */
-.toolTip .toolTipText, .scoredWord .toolTipText {
-    background-color: black;
+.toolTip .toolTipText,
+.scoredWord .toolTipText {
+    /* background-color: black; */
+    background-color: #193819;
 }
 
-header {
+.toolTip .toolTipText::after,
+.scoredWord .toolTipText::after {
+    border-color: #193819 transparent transparent transparent;
+}
+
+header, .superColumnHeader {
     background-color: #31572C;
 }
 
-input::file-selector-button, input:checked {
+input::file-selector-button,
+input:checked,
+th {
     background-color: #4F772D;
     accent-color: #4F772D;
 }
@@ -20,8 +29,19 @@ article > section {
     background-color: #BECE7A;
 }
 
-.subSection, .fileResultsHeader, .fileResultsContainer {
+/* td {
+    background-color: #ECF39E;
+} */
+
+.subSection,
+.fileResultsHeader,
+.fileResultsContainer {
     background-color: #F2F7BC;
+}
+
+td {
+    /* background-color: #dfeec8; */
+    background-color: #F5F9CB;
 }
 
 body, textarea, #verdict, #textResult {
@@ -34,7 +54,9 @@ body, textarea, #verdict, #textResult {
 
 /* text colors */
 
-.toolTip .toolTipText, .scoredWord .toolTipText {
+.toolTip .toolTipText,
+.scoredWord .toolTipText,
+th {
     color: white;
 }
 
@@ -48,7 +70,7 @@ body, textarea, #verdict, #textResult {
 /* general stylings */
 body {
     font-family: 'PT Sans', sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     margin: 0;
 }
 
@@ -62,11 +84,11 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-    font-size: 3.5rem;
+    font-size: 3rem;
 }
 
 h2 {
-    font-size: 2rem;
+    font-size: 1.8rem;
 }
 
 h3 {
@@ -177,6 +199,7 @@ article > section {
 #optionsSection section {
     display: flex;
     flex-direction: column;
+    font-size: 18px;
 }
 
 .subSection {
@@ -201,6 +224,7 @@ article > section {
 
 input[type="file"] {
     padding-top: 0.75rem;
+    font-size: 1rem;
 }
 
 input::file-selector-button {
@@ -209,6 +233,8 @@ input::file-selector-button {
     border: none;
     border-radius: 15px;
     color: white;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 
@@ -275,7 +301,6 @@ input::file-selector-button {
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: black transparent transparent transparent;
   }
 
 /* Show the tooltip text when you mouse over the tooltip container */
@@ -305,6 +330,25 @@ input::file-selector-button {
 }
 
 
+#tableContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+}
+
+table {
+    width: 100%;
+}
+
+th {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.superColumnHeader {
+    font-size: 1.2rem;
+}
 
 
 
