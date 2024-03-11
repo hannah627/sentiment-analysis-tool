@@ -10,9 +10,14 @@
     border-color: #193819 transparent transparent transparent;
 }
 
-header, .superColumnHeader {
+header, .superColumnHeader, .superRowHeader {
     background-color: #31572C;
 }
+
+/* .summaryTableContainer th:not(.superRowHeader):nth-child(even) {
+    background-color: #40672D;
+    background-color: #476929;
+} */
 
 input::file-selector-button,
 input:checked,
@@ -25,13 +30,9 @@ button {
     background-color: #709041;
 }
 
-article > section {
+article > section, .tableContainer {
     background-color: #BECE7A;
 }
-
-/* td {
-    background-color: #ECF39E;
-} */
 
 .subSection,
 .fileResultsHeader,
@@ -39,12 +40,16 @@ article > section {
     background-color: #F2F7BC;
 }
 
+/* .summaryTableContainer td:nth-child(odd),
+#scoresTable tr:nth-child(odd) td {
+    background-color: #eef2c1;
+} */
+
 td {
-    /* background-color: #dfeec8; */
     background-color: #F5F9CB;
 }
 
-body, textarea, #verdict, #textResult {
+body, textarea {
     background-color: #F7FBDA;
 }
 
@@ -138,13 +143,6 @@ button {
     border: none;
 }
 
-#verdict, #textResult {
-    margin: 0;
-    border-width: 1px;
-    border-style: solid;
-    border-color:rgb(90, 90, 90);
-}
-
 article > section {
     padding: 0.75rem;
     border-radius: 15px;
@@ -166,7 +164,7 @@ article > section {
     margin-bottom: 0px;
 }
 
-#optionsSectionHeader, #optionsSection, #listContainer, .fileResultsHeader {
+#optionsSectionHeader, #optionsSection, #listContainer, .fileResultsHeader, .dropDownHeader {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -274,6 +272,7 @@ input::file-selector-button {
     font-weight: 200;
     padding: 5px 0;
     border-radius: 6px;
+    opacity: 95%;
 
     /* Position the tooltip text */
     position: absolute; /* keeps underline from stretching for full width of tooltiptext*/
@@ -287,9 +286,25 @@ input::file-selector-button {
     margin-left: -100px; /* needs to be negative */
 }
 
+.toolTip .toolTipText a {
+    color: white;
+    text-decoration: underline;
+}
+
+.toolTip .toolTipText a:hover {
+    color: rgb(228, 224, 224);
+}
+
 .scoredWord .toolTipText {
     width: 120px;
     margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+#optionsSection .toolTip .toolTipText {
+    width: 450px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: -225px; /* negative half the width */
 }
 
 /* creating the arrow at the bottom of the tooltip */
@@ -310,27 +325,21 @@ input::file-selector-button {
 
 
 
-#listContainer {
-    /* display: flex;
-    flex-direction: row; */
-    width: 80%;
-}
 
-.wordsListContainer {
-    /* padding-left: 50px; */
-    width: 50%;
-}
-
-.wordsListContainer h3 {
-    font-size: 1rem;
-}
-
-.wordsListContainer ul {
-    margin-block-start: 0px;
+#singleInputResultsSection .subSection {
+    margin-top: 1rem;
 }
 
 
-#tableContainer {
+
+
+
+#tableSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.tableContainer {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -346,8 +355,16 @@ th {
     padding-bottom: 0.5rem;
 }
 
-.superColumnHeader {
+.superColumnHeader, .superRowHeader {
     font-size: 1.2rem;
+}
+
+.summaryTableContainer td {
+    text-align: center;
+}
+
+.summaryTableContainer .toolTip {
+    border-bottom: 1px dotted white;
 }
 
 
@@ -360,7 +377,7 @@ th {
     align-items: center;
 }
 
-.fileResultsButton {
+.arrowButton {
     padding: 7px;
 }
 

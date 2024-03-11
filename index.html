@@ -36,13 +36,20 @@
                 <section id="optionsSection">
                     <section id="stopwordsOptions" class="subSection">
                         <h3>Stop words</h3>
-                        <p>Stop words are words that are filtered out from a text or texts before processing so that they aren't included in the results of that processing </p>
+                        <p>Stop words are words that are filtered out from a text or texts before processing so that they aren't included in the results of that processing.</p>
                         <p>Which stop words list(s) would you like to use?</p>
                         <br>
                         <span>
                             <input type="checkbox" id="stopwords1" name="stopwords" value="nltk" checked>
                             <label for="stopwords1" class="toolTip">NLTK Stop Words
-                                <span class="toolTipText">NLTK stands for "Natural Language Tool Kit" </span>
+                                <div class="toolTipText">
+                                    <p>NLTK stands for "Natural Language Tool Kit", and it provides a basic list of English stop words for work with natural language processing.</p>
+                                    <p>
+                                        <a href="stop_words_lists/nltk_stop_words.txt">See full list of words</a>
+                                        or
+                                        <a href="https://github.com/nltk/nltk/wiki/FAQ">learn more</a>
+                                    </p>
+                                </div>
                             </label>
                         </span>
                         <span>
@@ -61,17 +68,38 @@
                             <input type="file" name="customStopWordsFile" id="customStopWordsFile">
                         </section>
                     </section>
+
                     <section id="lexiconOptions" class="subSection">
                         <h3>Lexicon</h3>
+                        <p>Sentiment lexicons are a way of providing terms that should be scored, and the scores associated with them.</p>
+                        <p>This tool applies scores in a cascading manner, where if the same word appears in more than one lexicon, than the score for that term in the latest lexicon that contains it will be chosen. As such, if you disagree with a score for one or more words in the default lexicons, you can use the custom lexicon to change it.</p>
                         <p>Which lexicon(s) would you like to use?</p>
 
                         <span>
                             <input type="checkbox" id="lexicon1" name="lexicon" value="AFINN_en" checked>
-                            <label for="lexicon1" class="toolTip">AFINN English<iframe src="lexicons/afinn-lexicon-en-165.txt" class="toolTipText"></iframe></label>
+                            <label for="lexicon1" class="toolTip">
+                                AFINN English
+                                <div class="toolTipText">
+                                    <p>AFINN is a list of terms scored on emotional valence from -5 to 5, created by Finn Årup Nielsen. It contains over 3000 terms, and is often considered one of the standards for sentiment analysis. This version is afinn-en-165.</p>
+                                    <p>
+                                        <a href="lexicons/afinn-lexicon-en-165.txt">See full list of words</a>
+                                        or
+                                        <a href="http://corpustext.com/reference/sentiment_afinn.html#:~:text=The%20AFINN%20lexicon%20is%20a,Nielsen%20between%202009%20and%202011.">learn more</a>
+                                    </p>
+                                </div>
+                            </label>
                         </span>
                         <span>
                             <input type="checkbox" id="lexicon2" name="lexicon" value="historical" checked>
-                            <label for="lexicon2" class="toolTip">Historical Lexicon<iframe src="lexicons/lexicon-v1.txt" class="toolTipText"></iframe></label>
+                            <label for="lexicon2" class="toolTip">
+                                Historical Lexicon
+                                <div class="toolTipText">
+                                    <p>The Historical Lexicon is one in the same vein as AFINN, but created a few years later by extracting words with emotional valence from historical, English-language texts from the 1800s and 1900s.</p>
+                                    <p>
+                                        <a href="lexicons/lexicon-v1.txt">See full list of words</a>
+                                    </p>
+                                </div>
+                            </label>
                         </span>
                         <span>
                             <input type="checkbox" id="lexicon3" name="lexicon" value="custom">
@@ -103,50 +131,113 @@
                 </section>
 
 
-                <section id="resultsSection">
+                <section id="singleInputResultsSection">
                     <h2>Results</h2>
 
-                    <div id="singleInputResults">
-                        <label class="large-label">Verdict:</label>
-                        <div id="verdict"></div>
+                    <section class="subSection">
+                        <h3>Summary:</h3>
+                        <div class="tableContainer summaryTableContainer" id="singleInputSummaryTableContainer">
+                            <table>
+                                <colgroup span="2"></colgroup>
+                                <colgroup span="2"></colgroup>
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" scope="colgroup" class="superColumnHeader">Scores</th>
+                                        <th colspan="2" scope="colgroup" class="superColumnHeader">Tokens</th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">
+                                            <span class='toolTip'>Comparative Score
+                                                <span class='toolTipText'>The Total Score divided by the number of words</span>
+                                            </span>
+                                        </th>
+                                        <th scope="col">
+                                            <span class='toolTip'>Total Score
+                                                <span class='toolTipText'>The sum of the scores of all scored tokens</span>
+                                            </span>
+                                        </th>
 
-                        <div id="tableContainer">
+                                        <th scope="col">Scored Tokens</th>
+                                        <th scope="col">Total Tokens</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="compScoreCell"></td>
+                                        <td id="totalScoreCell"></td>
+                                        <td id="scoredTokensCell"></td>
+                                        <td id="totalTokensCell"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                            <!-- horizontal table -->
+                            <!-- <table>
+                                <col>
+                                <col>
+                                <col>
+                                <tr>
+                                    <th rowspan="2" scope="rowgroup" class="superRowHeader">Scores</th>
+                                    <th scope="row">Comparative Score</th>
+                                    <td id="compScoreCell"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Total Score</th>
+                                    <td id="totalScoreCell"></td>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2" scope="rowgroup" class="superRowHeader">Tokens</th>
+                                    <th scope="row">Scored Tokens</th>
+                                    <td id="scoredTokensCell"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Total Tokens</th>
+                                    <td id="totalTokensCell"></td>
+                                </tr>
+                            </table> -->
+                        </div>
+                        <div id="verdict"></div>
+                    </section>
+
+                    <section id="tableSection" class="subSection">
+                        <div>
+                            <h3>Scored Terms</h3>
+                        </div>
+                        <div class="tableContainer">
                             <table id="scoresTable">
                                 <colgroup span="3"></colgroup>
                                 <colgroup span="3"></colgroup>
-                                <tr>
-                                    <th colspan="3" scope="colgroup" class="superColumnHeader">Positive Terms</th>
-                                    <th colspan="3" scope="colgroup" class="superColumnHeader">Negative Terms</th>
-                                </tr>
-                                <tr>
-                                    <th scope="col">Term</th>
-                                    <th scope="col">Score</th>
-                                    <th scope="col">Lexicon</th>
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" scope="colgroup" class="superColumnHeader">Positive Terms</th>
+                                        <th colspan="3" scope="colgroup" class="superColumnHeader">Negative Terms</th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Term</th>
+                                        <th scope="col">Score</th>
+                                        <th scope="col">Lexicon</th>
 
-                                    <th scope="col">Term</th>
-                                    <th scope="col">Score</th>
-                                    <th scope="col">Lexicon</th>
-                                </tr>
-                                <tr>
-                                    <td>Test</td>
-                                    <td>Data</td>
-                                    <td></td>
-
-                                    <td>Testing</td>
-                                    <td>hello</td>
-                                    <td></td>
-                                </tr>
+                                        <th scope="col">Term</th>
+                                        <th scope="col">Score</th>
+                                        <th scope="col">Lexicon</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
                             </table>
                         </div>
+                    </section>
 
-                        <br>
-
-                        <label class="large-label">Full Text:</label>
+                    <section class="subSection">
+                        <h3>Full Text:</h3> <!-- I want to make full text a dropdown/expandable-->
                         <div id="textResult"></div>
+                    </section>
 
                         <br>
-                    </div>
+                </section>
 
+                <section id="multipleInputsResultsSection">
+                    <h2>Results</h2>
                     <div id="multipleFilesResults"></div>
                 </section>
 
@@ -157,6 +248,7 @@
         <footer>
             <p></p>
         </footer>
-        <script src="src/index.js"></script>
+        <script src="src/index.js" type="module"></script>
+        <script src="src/creating_elements.js" type="module"></script>
     </body>
 </html>

@@ -1,6 +1,10 @@
-"use strict";
+import {
+    createFileResultsHeader,
+    addRowsToTokenTable,
+    createSummarySection,
+    createDropDownHeader
+} from './creating_elements.js';
 
-(function() {
 
 const AFINN_LINK = "lexicons/afinn-lexicon-en-165.txt";
 const HISTORICAL_LINK = "lexicons/lexicon-v1.txt";
@@ -35,8 +39,10 @@ function init() {
     id("optionsSection").style.display = "none";
     id("customLexiconSection").style.display = "none";
     id("customStopwordsSection").style.display = "none";
-    id("singleInputResults").style.display = "none";
-    id("tableContainer").style.display = "none";
+
+    id("singleInputResultsSection").style.display = "none";
+    id("multipleInputsResultsSection").style.display = "none";
+    id("tableSection").style.display = "none";
 
     // adding general event listeners (options section button, main text input)
     id("optionsSectionHeader").addEventListener("click", () =>
@@ -130,13 +136,15 @@ function toggleDropDownSectionVisibility(sectionContentID, sectionHeaderID, arro
 
 
 function processInputtedText() {
-    id("singleInputResults").style.display = "block"; // unhide full text container
+    id("singleInputResultsSection").style.display = "block"; // unhide full text container
     let inputtedText = id("input").value;
     processSingleFileOrInputText(inputtedText);
 }
 
 function processInputtedFile(e) {
+    tableSection.style.display = "none";
     clearResultsSection();
+
     let files = e.currentTarget.files;
     Object.keys(files).forEach(i => {
         let file = files[i];
@@ -144,11 +152,18 @@ function processInputtedFile(e) {
         reader.onload = () => {
             let file_text = reader.result;
             if (files.length == 1) {
-                id("singleInputResults").style.display = "block";
+                id("singleInputResultsSection").style.display = "block";
+                id("multipleInputsResultsSection").style.display = "none";
                 processSingleFileOrInputText(file_text)
+
+                id("singleInputResultsSection").scrollIntoView({behavior: 'smooth'});
+
             } else {
-                id("singleInputResults").style.display = "none";
+                id("singleInputResultsSection").style.display = "none";
+                id("multipleInputsResultsSection").style.display = "block";
                 processOneOfMultipleFiles(file.name, file_text);
+
+                id("singleInputResultsSection").scrollIntoView({behavior: 'smooth'});
             }
         }
         reader.readAsText(file);
@@ -189,41 +204,32 @@ function processOneOfMultipleFiles(fileName, fileText) {
     resultsSection.appendChild(fileResultsContainer);
 }
 
+
 // create and pass a file dictionary {}?
 function createFileResultsSection(fileName, textScore, totalNumTokens, text, scoredWords) {
-    let resultsHeader = gen("section");
-    resultsHeader.id = fileName + "ResultsHeader";
-    resultsHeader.classList.add("fileResultsHeader");
+    let resultsHeader = createFileResultsHeader(fileName, textScore, totalNumTokens);
 
-    let fileTitle = gen("h4");
-    fileTitle.textContent = fileName;
-
-    let score = gen("h4");
-    score.textContent = (textScore / totalNumTokens).toFixed(3);
-
-    let arrow = gen("i");
-    arrow.classList.add("arrow");
-    arrow.classList.add("down");
-    arrow.id = fileName + "Arrow";
-
-    let button = gen("button");
-    button.classList.add("fileResultsButton");
-    button.appendChild(arrow);
-
-    let scoreAndButtonContainer = gen("div");
-    scoreAndButtonContainer.classList.add("scoreAndButtonContainer");
-
-    scoreAndButtonContainer.appendChild(score);
-    scoreAndButtonContainer.appendChild(button);
-
-    resultsHeader.appendChild(fileTitle);
-    resultsHeader.appendChild(scoreAndButtonContainer);
-
-    let resultsContainer = gen("section");
+    let resultsContainer = gen("section"); // make this contain two more dropdowns? one for full text, one for seeing score tokens?
     resultsContainer.classList.add("fileResultsContainer");
     resultsContainer.id = fileName + "ResultsContainer";
-    resultsContainer.style.display = "none";
-    returnFullText(text, resultsContainer, scoredWords);
+    resultsContainer.style.display = "none"; // file results hidden by default
+
+    // do the tables for each file
+    let summarySection = createSummarySection(textScore, totalNumTokens, scoredWords.length)
+    resultsContainer.appendChild(summarySection);
+
+
+    // do the dropwdown for whole text
+    let fullTextDropDownHeader = createDropDownHeader('Full Text', fileName + "FullText");
+    let fullTextContainer = createFullTextDropdown(fileName, text, scoredWords);
+
+    resultsContainer.appendChild(fullTextDropDownHeader);
+    resultsContainer.appendChild(fullTextContainer);
+
+    fullTextDropDownHeader.addEventListener("click", () => {
+        toggleDropDownSectionVisibility(fileName + "FullTextContainer",
+                                        fileName + "FullTextHeader",
+                                        fileName + "FullTextArrow", "block") });
 
     resultsHeader.addEventListener("click", () => {
         toggleDropDownSectionVisibility(fileName + "ResultsContainer", fileName + "ResultsHeader", fileName + "Arrow", "block") });
@@ -232,13 +238,24 @@ function createFileResultsSection(fileName, textScore, totalNumTokens, text, sco
 }
 
 
+ function createFullTextDropdown(nameForID, text, scoredWords) {
+    let fullTextContainer = gen("section");
+    fullTextContainer.id = nameForID + "FullTextContainer";
+    returnFullText(text, fullTextContainer, scoredWords);
+    fullTextContainer.style.display = "none";
+
+    return fullTextContainer
+}
+
+
+
 
 
 
 function processText(text) {
     let formatted_text = lowerCaseAndRemovePunctuationOfText(text);
     let tokens = tokenizeText(formatted_text);
-    let totalNumTokens = tokens.length; // for the verdict section
+    let totalNumTokens = tokens.length;
 
     let stopwordsList = makeFullStopwordsList();
     let filteredTokens = removeStopWords(tokens, stopwordsList);
@@ -339,51 +356,48 @@ function scoreText(tokens, lexicon) {
 
 
 function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
-    // doing this to prevent table from being destroyed if multiple inputs happen before refresh
-    let resultsSection = id("resultsSection");
-    let tableContainer = id("tableContainer");
-    tableContainer.style.display = "none";
-    resultsSection.appendChild(tableContainer);
-
     let verdictSection = id("verdict");
-    verdictSection.textContent = ''; // reset the verdict section so we don't just keep adding paragraphs to it
+    let summaryTableContainer = id("singleInputSummaryTableContainer");
 
+    let tableSection = id("tableSection");
+
+        // if scoredWords.length > 10 (or something), then put table into dropdown?
 
     if (scoredWords.length > 0) {
-        let totalExplanation = "<span class='toolTip'>Total Score:<span class='toolTipText'>The sum of the scores of all scored tokens</span></span>"
-        let compExplanation = "<span class='toolTip'>Comparative Score:<span class='toolTipText'>The Total Score divided by the number of words</span></span>"
+        verdictSection.style.display = "none";
+        summaryTableContainer.style.display = "flex";
 
-        appendTextElementToSection("p", verdictSection, totalExplanation + " " + textScore);
-        appendTextElementToSection("p", verdictSection, compExplanation + " " + (textScore / totalNumTokens).toFixed(3));
-        appendTextElementToSection("p", verdictSection, "The number of scored terms was " + scoredWords.length + ", out of a total of " + totalNumTokens + " tokens.");
-        appendTextElementToSection("p", verdictSection, "The terms and their scores were:");
+        id("compScoreCell").textContent = (textScore / totalNumTokens).toFixed(3);
+        id("totalScoreCell").textContent = textScore;
+        id("scoredTokensCell").textContent = scoredWords.length;
+        id("totalTokensCell").textContent = totalNumTokens;
 
-        let listContainer = gen("div");
-        listContainer.id = "listContainer";
 
-        let positiveWordsListContainer = makeScoresList("Positive");
-        let positiveWordsList = positiveWordsListContainer.lastChild;
-
-        let negativeWordsListContainer = makeScoresList("Negative");
-        let negativeWordsList = negativeWordsListContainer.lastChild;
+        let positiveWords = [];
+        let negativeWords = [];
+        let wordsSeen = [];
 
         scoredWords.forEach((entry) => { // adjust so it only displays each word once?
             let [token, score] = entry;
-            let sentence = token + ": " + score;
-            if (score > 0) {
-                appendTextElementToSection("li", positiveWordsList, sentence);
-            } else {
-                appendTextElementToSection("li", negativeWordsList, sentence);
+            if (!wordsSeen.includes(token)) {
+                if (score > 0) {
+                    positiveWords.push([token, score]);
+                } else {
+                    negativeWords.push([token, score]);
+                }
+                wordsSeen.push(token);
             }
         })
-        listContainer.appendChild(positiveWordsListContainer);
-        listContainer.appendChild(negativeWordsListContainer);
 
-        verdictSection.appendChild(listContainer);
+        addRowsToTokenTable(positiveWords, negativeWords, 'scoresTable');
+        tableSection.style.display = "flex";
 
-        verdictSection.appendChild(tableContainer);
-        tableContainer.style.display = "flex";
     } else {
+        tableSection.style.display = "none";
+        summaryTableContainer.style.display = "none";
+
+        verdictSection.textContent = '';
+        verdictSection.style.display = "block";
         appendTextElementToSection("p", verdictSection, "No words of the inputted text matched any terms in the currently selected lexicon(s), and thus, no words have been scored.");
     }
 }
@@ -395,35 +409,6 @@ function appendTextElementToSection(element, parentElement, text) {
     parentElement.append(e);
 }
 
-function makeScoresList(type) {
-    let WordsListContainer = gen("div");
-    WordsListContainer.classList.add("wordsListContainer");
-
-    let title = gen("h3");
-    title.textContent = type + " Words:"
-    WordsListContainer.appendChild(title);
-
-    let WordsList = gen("ul");
-    WordsList.id = type + "WordsList";
-    WordsListContainer.appendChild(WordsList);
-
-    return WordsListContainer;
-}
-
-function addRowsToTable(positiveWordsList, negativeWordsList, tableID) {
-    let table = id(tableID)
-    let numRows = Math.max(positiveWordsList.length, negativeWordsList.length);
-    for (let i = 0; i < numRows; i++) {
-        let rowContainer = gen("tr");
-        console.log(positiveWordsList[i]);
-        console.log(negativeWordsList[i]);
-    }
-}
-
-function createTableCells() {
-    // take positive or negative
-    // create 3 table cells, with term score lexicon
-}
 
 
 
@@ -452,10 +437,10 @@ function returnFullText(text, textSection, scoredWords) {
                     toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
                 }
 
-            } else if (currentWordToken == currentToken) { // going to be an issue with this check, because not want != want
+            } else if (currentWordToken == currentToken) {
                 let score = scoredWords[0][1];
                 toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
-                scoredWords.splice(0, 1); //should remove from scoredWords list; makes it faster?
+                scoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
             }
         }
         textSectionContent.push(toAppend);
@@ -475,7 +460,7 @@ function returnFullText(text, textSection, scoredWords) {
  * @param {string} idName - the id of the element to be located
  * @returns {Element} with id idName
  */
-function id(idName) {
+export function id(idName) {
     return document.getElementById(idName);
 }
 
@@ -484,8 +469,6 @@ function id(idName) {
  * @param {string} tagName - the name of the element to create
  * @returns {Element} of type tagName
  */
-function gen(tagName) {
+export function gen(tagName) {
     return document.createElement(tagName);
 }
-
-})();
