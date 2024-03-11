@@ -41,7 +41,38 @@ function createArrowButton(idForArrow) {
 
 
 
-// SUMMARY TABLES
+// TABLE SECTION
+
+
+function createSuperHeaders(table, colgroupSpan, superCol1Name, superCol2Name) {
+    let colgroup = gen("colgroup");
+    colgroup.span = colgroupSpan;
+    table.appendChild(colgroup);
+    table.appendChild(colgroup.cloneNode(true));
+
+    let thead = gen("thead");
+    let superHeaderRow = gen("tr");
+    let scoreSuperHeader = gen("th");
+    scoreSuperHeader.colSpan = colgroupSpan;
+    scoreSuperHeader.scope = "colgroup";
+    scoreSuperHeader.classList.add("superColumnHeader");
+    scoreSuperHeader.textContent = superCol1Name;
+
+    let tokenSuperHeader = gen("th");
+    tokenSuperHeader.colSpan = colgroupSpan;
+    tokenSuperHeader.scope = "colgroup";
+    tokenSuperHeader.classList.add("superColumnHeader");
+    tokenSuperHeader.textContent = superCol2Name;
+
+    superHeaderRow.appendChild(scoreSuperHeader);
+    superHeaderRow.appendChild(tokenSuperHeader);
+    thead.appendChild(superHeaderRow);
+
+    return thead;
+}
+
+
+// SUMMARY TABLE
 export function createSummarySection(textScore, totalNumTokens, numScoredTokens) {
     let summarySection = gen("section");
 
@@ -62,29 +93,7 @@ function createSummaryTable(textScore, totalNumTokens, numScoredTokens) {
     container.classList.add("summaryTableContainer");
 
     let table = gen("table");
-    let colgroup = gen("colgroup");
-    colgroup.span = "2";
-    table.appendChild(colgroup);
-    table.appendChild(colgroup.cloneNode(true));
-
-    let thead = gen("thead");
-    let superHeaderRow = gen("tr");
-    let scoreSuperHeader = gen("th");
-    scoreSuperHeader.colSpan = "2";
-    scoreSuperHeader.scope = "colgroup";
-    scoreSuperHeader.classList.add("superColumnHeader");
-    scoreSuperHeader.textContent = "Scores";
-
-    let tokenSuperHeader = gen("th");
-    tokenSuperHeader.colSpan = "2";
-    tokenSuperHeader.scope = "colgroup";
-    tokenSuperHeader.classList.add("superColumnHeader");
-    tokenSuperHeader.textContent = "Tokens";
-
-    superHeaderRow.appendChild(scoreSuperHeader);
-    superHeaderRow.appendChild(tokenSuperHeader);
-    thead.appendChild(superHeaderRow);
-
+    let thead = createSuperHeaders(table, "2", "Scores", "Tokens");
 
     let headerRow = gen("tr");
 
@@ -141,14 +150,83 @@ function createSummaryTable(textScore, totalNumTokens, numScoredTokens) {
 
 
 
-
-
 // TOKEN TABLES
+export function createTokenTableSection(fileName) {
+    let tableSection = gen("section");
+    let heading = gen("h3");
+    heading.textContent = "Scored Terms";
+    tableSection.appendChild(heading);
 
-export function addRowsToTokenTable(positiveWords, negativeWords, tableID) {
+    let tableContainer = createTokenTable(fileName);
+    tableSection.appendChild(tableContainer);
+
+    return tableSection;
+}
+
+function createTokenTable(fileName) {
+    let container = gen("div");
+    container.classList.add("tableContainer");
+
+    let table = gen("table");
+    table.id = fileName + "TokenTable";
+
+    let thead = createSuperHeaders(table, "3", "Positive Terms", "Negative Terms");
+
+    let headerRow = gen("tr");
+    createTokenTableHeaderCell(headerRow, "Term");
+    createTokenTableHeaderCell(headerRow, "Score");
+    createTokenTableHeaderCell(headerRow, "Lexicon");
+
+    createTokenTableHeaderCell(headerRow, "Term");
+    createTokenTableHeaderCell(headerRow, "Score");
+    createTokenTableHeaderCell(headerRow, "Lexicon");
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    let tbody = gen("tbody");
+    table.appendChild(tbody);
+
+    container.appendChild(table);
+    return container;
+}
+
+
+function createTokenTableHeaderCell(headerRow, text) {
+    let termHeader = gen("th");
+    termHeader.scope = "col";
+    termHeader.textContent = text;
+    headerRow.appendChild(termHeader);
+}
+
+
+function findPositiveAndNegativeTerms(scoredWords) {
+    let positiveWords = [];
+    let negativeWords = [];
+    let wordsSeen = [];
+
+    scoredWords.forEach((entry) => {
+        let [token, score] = entry;
+        if (!wordsSeen.includes(token)) { // adjusted so it only displays each word once
+            if (score > 0) {
+                positiveWords.push([token, score]);
+            } else {
+                negativeWords.push([token, score]);
+            }
+            wordsSeen.push(token);
+        }
+    })
+    return [positiveWords, negativeWords];
+}
+
+
+export function addRowsToTokenTable(scoredWords, tableID) {
     let table = id(tableID);
     let tbody = table.lastElementChild;
     tbody.innerHTML = '';
+
+    let [positiveWords, negativeWords] = findPositiveAndNegativeTerms(scoredWords);
+    console.log(positiveWords) // it's not finding scored words
 
     let numRows = Math.max(positiveWords.length, negativeWords.length);
     for (let i = 0; i < numRows; i++) {

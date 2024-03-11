@@ -2,6 +2,7 @@ import {
     createFileResultsHeader,
     addRowsToTokenTable,
     createSummarySection,
+    createTokenTableSection,
     createDropDownHeader
 } from './creating_elements.js';
 
@@ -202,6 +203,9 @@ function processOneOfMultipleFiles(fileName, fileText) {
     let resultsSection = id("multipleFilesResults");
     resultsSection.appendChild(fileResultsHeader);
     resultsSection.appendChild(fileResultsContainer);
+
+    // add rows to table up here, b/c it needs to be in the DOM
+    addRowsToTokenTable(scoredWords, fileName + "TokenTable");
 }
 
 
@@ -218,8 +222,10 @@ function createFileResultsSection(fileName, textScore, totalNumTokens, text, sco
     let summarySection = createSummarySection(textScore, totalNumTokens, scoredWords.length)
     resultsContainer.appendChild(summarySection);
 
+    let tokenTableSection = createTokenTableSection(fileName);
+    resultsContainer.appendChild(tokenTableSection);
 
-    // do the dropwdown for whole text
+    // do the dropwdown for full text
     let fullTextDropDownHeader = createDropDownHeader('Full Text', fileName + "FullText");
     let fullTextContainer = createFullTextDropdown(fileName, text, scoredWords);
 
@@ -367,29 +373,14 @@ function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
         verdictSection.style.display = "none";
         summaryTableContainer.style.display = "flex";
 
+        // fill our the cells in the summary table
         id("compScoreCell").textContent = (textScore / totalNumTokens).toFixed(3);
         id("totalScoreCell").textContent = textScore;
         id("scoredTokensCell").textContent = scoredWords.length;
         id("totalTokensCell").textContent = totalNumTokens;
 
-
-        let positiveWords = [];
-        let negativeWords = [];
-        let wordsSeen = [];
-
-        scoredWords.forEach((entry) => { // adjust so it only displays each word once?
-            let [token, score] = entry;
-            if (!wordsSeen.includes(token)) {
-                if (score > 0) {
-                    positiveWords.push([token, score]);
-                } else {
-                    negativeWords.push([token, score]);
-                }
-                wordsSeen.push(token);
-            }
-        })
-
-        addRowsToTokenTable(positiveWords, negativeWords, 'scoresTable');
+        // find positive and negative words, and create rows for them in the tokens table
+        addRowsToTokenTable(scoredWords, 'scoresTable');
         tableSection.style.display = "flex";
 
     } else {
@@ -411,36 +402,36 @@ function appendTextElementToSection(element, parentElement, text) {
 
 
 
-
-
 function returnFullText(text, textSection, scoredWords) {
     let textSectionContent = [];
     let fullTextTokens = tokenizeText(text);
+
+    let copyScoredWords = [...scoredWords]; // use copy of scoredWords, b/c we delete from it
 
     for (let i = 0; i < fullTextTokens.length; i++) {
         let currentWord = fullTextTokens[i];
         let toAppend = currentWord;
         let currentWordToken = lowerCaseAndRemovePunctuationOfText(currentWord);
 
-        if (scoredWords.length > 0) { // check b/c if we don't have any more words with scores, no point doing this
-            let currentToken = scoredWords[0][0]; // get the first part of the first line in scoredWords (b/c format is "word, 5")
+        if (copyScoredWords.length > 0) { // check b/c if we don't have any more words with scores, no point doing this
+            let currentToken = copyScoredWords[0][0]; // get the first part of the first line in scoredWords (b/c format is "word, 5")
 
             if (currentToken.split(' ')[0] == "not") { // if token was 2 words, and the first is "not"
                 currentWordToken = "not " + currentWordToken;
 
                 if (currentWordToken == currentToken) {
                     textSectionContent.pop(); // remove the last part of the textSectionContent array so that "not" isn't there twice
-                    scoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
+                    copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
 
                     currentWord = fullTextTokens[i - 1] + " " + currentWord;
-                    let score = scoredWords[0][1];
+                    let score = copyScoredWords[0][1];
                     toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
                 }
 
             } else if (currentWordToken == currentToken) {
-                let score = scoredWords[0][1];
+                let score = copyScoredWords[0][1];
                 toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
-                scoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
+                copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
             }
         }
         textSectionContent.push(toAppend);
