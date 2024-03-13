@@ -205,17 +205,29 @@ function findPositiveAndNegativeTerms(scoredWords) {
     let negativeWords = [];
     let wordsSeen = [];
 
-    scoredWords.forEach((entry) => {
-        let [token, score] = entry;
-        if (!wordsSeen.includes(token)) { // adjusted so it only displays each word once
-            if (score > 0) {
-                positiveWords.push([token, score]);
+    for (let i = 0; i < scoredWords.length; i++) {
+        let entry = scoredWords[i];
+        if (!wordsSeen.includes(entry.token)) {
+            if (entry.score > 0) {
+                positiveWords.push(entry);
             } else {
-                negativeWords.push([token, score]);
+                negativeWords.push(entry);
             }
-            wordsSeen.push(token);
+            wordsSeen.push(entry.token);
         }
-    })
+    }
+
+    // scoredWords.forEach((entry) => {
+    //     let [token, score] = entry;
+    //     if (!wordsSeen.includes(token)) { // adjusted so it only displays each word once
+    //         if (score > 0) {
+    //             positiveWords.push([token, score]);
+    //         } else {
+    //             negativeWords.push([token, score]);
+    //         }
+    //         wordsSeen.push(token);
+    //     }
+    // })
     return [positiveWords, negativeWords];
 }
 
@@ -226,22 +238,21 @@ export function addRowsToTokenTable(scoredWords, tableID) {
     tbody.innerHTML = '';
 
     let [positiveWords, negativeWords] = findPositiveAndNegativeTerms(scoredWords);
-    console.log(positiveWords) // it's not finding scored words
 
     let numRows = Math.max(positiveWords.length, negativeWords.length);
     for (let i = 0; i < numRows; i++) {
         let rowContainer = gen("tr");
 
         if (positiveWords[i] != null) {
-            createTokenTableCells(positiveWords[i][0], positiveWords[i][1], '', rowContainer)
+            createTokenTableCells(positiveWords[i], rowContainer)
         } else {
-            createTokenTableCells('', '', '', rowContainer)
+            createTokenTableCells('', rowContainer)
         }
 
         if (negativeWords[i] != null) {
-            createTokenTableCells(negativeWords[i][0], negativeWords[i][1], '', rowContainer)
+            createTokenTableCells(negativeWords[i], rowContainer)
         } else {
-            createTokenTableCells('', '', '', rowContainer)
+            createTokenTableCells('', rowContainer)
         }
 
         tbody.appendChild(rowContainer);
@@ -249,17 +260,17 @@ export function addRowsToTokenTable(scoredWords, tableID) {
     table.appendChild(tbody);
 }
 
-function createTokenTableCells(term, score, lexicon, row) {
+function createTokenTableCells(entry, row) {
     let termCell = gen("td");
-    termCell.textContent = term;
+    termCell.textContent = entry.token;
     row.appendChild(termCell);
 
     let scoreCell = gen("td");
-    scoreCell.textContent = score;
+    scoreCell.textContent = entry.score;
     row.appendChild(scoreCell);
 
     let lexiconCell = gen("td");
-    lexiconCell.textContent = lexicon;
+    lexiconCell.textContent = entry.lexicon;
     row.appendChild(lexiconCell);
 }
 

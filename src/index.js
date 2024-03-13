@@ -25,6 +25,9 @@ let customStopwordsList = [];
 let currentLexicons = ['AFINN_en', 'historical'];
 let currentStopwords = ['nltk', 'tool'];
 
+let totalFilesProcessed = 0;
+let totalCorpusScore = 0;
+
 
 // when the page loads, call "init"
 window.addEventListener("load", init);
@@ -69,17 +72,21 @@ async function getFileLexicons() {
         fetch(AFINN_LINK).then(x => x.text()),
         fetch(HISTORICAL_LINK).then(x => x.text())
     ]).then(([afinnLexicon, historicalLexicon]) => {
-        processFileLexicon(afinnLexicon, '\t', AFINN_obj);
-        processFileLexicon(historicalLexicon, ' ', historicalLexiconObj);
+        processFileLexicon(afinnLexicon, '\t', AFINN_obj, "AFINN English");
+        processFileLexicon(historicalLexicon, ' ', historicalLexiconObj, "Historical Lexicon");
     });
 }
 
-function processFileLexicon(lexicon, separator, lexiconObj) {
+function processFileLexicon(lexicon, separator, lexiconObj, lexiconName) {
     let lines = lexicon.split('\n');
     lines.forEach((line) => {
         let [word, score] = line.split(separator);
 
-        lexiconObj[word] = score;
+        // lexiconObj[word] = score;
+        lexiconObj[word] = {
+            "score": score,
+            "lexicon": lexiconName
+        };
     })
 }
 
@@ -142,42 +149,70 @@ function processInputtedText() {
     processSingleFileOrInputText(inputtedText);
 }
 
+
 function processInputtedFile(e) {
     tableSection.style.display = "none";
     clearResultsSection();
+    totalFilesProcessed = 0;
+    totalCorpusScore = 0;
 
     let files = e.currentTarget.files;
-    Object.keys(files).forEach(i => {
+    for (let i = 0; i < files.length; i++) {
         let file = files[i];
         let reader = new FileReader();
-        reader.onload = () => {
-            let file_text = reader.result;
+        reader.onload = (function() {
             if (files.length == 1) {
-                id("singleInputResultsSection").style.display = "block";
-                id("multipleInputsResultsSection").style.display = "none";
-                processSingleFileOrInputText(file_text)
-
-                id("singleInputResultsSection").scrollIntoView({behavior: 'smooth'});
-
-            } else {
-                id("singleInputResultsSection").style.display = "none";
-                id("multipleInputsResultsSection").style.display = "block";
-                processOneOfMultipleFiles(file.name, file_text);
-
-                id("singleInputResultsSection").scrollIntoView({behavior: 'smooth'});
+                return function() { singleFileOnLoadHandler(this) }
             }
-        }
+            else {
+                return function() {
+                    onLoadHandler(this, file, files.length);
+                    onLoadEndHandler(files.length);
+               };
+            }
+        })(file);
         reader.readAsText(file);
-    })
-    if (files.length > 1) {
-        console.log("we can add an extra function here to do sum and total results stuff");
+    }
+}
+
+
+function singleFileOnLoadHandler(reader) {
+    let file_text = reader.result;
+    id("singleInputResultsSection").style.display = "block";
+    id("multipleInputsResultsSection").style.display = "none";
+    processSingleFileOrInputText(file_text)
+
+    id("singleInputResultsSection").scrollIntoView({behavior: 'smooth'});
+}
+
+
+function onLoadHandler(reader, file) {
+    let file_text = reader.result;
+    id("singleInputResultsSection").style.display = "none";
+    id("multipleInputsResultsSection").style.display = "block";
+    let score = processOneOfMultipleFiles(file.name, file_text);
+    totalCorpusScore = totalCorpusScore + score;
+}
+
+
+function onLoadEndHandler(numFiles) {
+    totalFilesProcessed++;
+    if (totalFilesProcessed == numFiles) { // need to do this b/c need to wait for all files to be processed for corpus score
         let resultsSection = id("multipleFilesResults");
 
         let summaryText = gen("p");
         summaryText.textContent = "The results for all files is shown below:"
         resultsSection.prepend(summaryText);
-    }
+
+        let corpusResultsText = gen("p");
+        corpusResultsText.textContent = "Overall corpus score: " + (totalCorpusScore / numFiles).toFixed(3);
+        resultsSection.prepend(corpusResultsText);
+        id("multipleInputsResultsSection").scrollIntoView({behavior: 'smooth'});
+    };
 }
+
+
+
 
 function clearResultsSection () {
     id("verdict").innerHTML = "";
@@ -204,8 +239,10 @@ function processOneOfMultipleFiles(fileName, fileText) {
     resultsSection.appendChild(fileResultsHeader);
     resultsSection.appendChild(fileResultsContainer);
 
-    // add rows to table up here, b/c it needs to be in the DOM
+    // add rows to table up here, b/c table needs to be in the DOM to find it by ID, so sections need to be appended
     addRowsToTokenTable(scoredWords, fileName + "TokenTable");
+
+    return (textScore / totalNumTokens);
 }
 
 
@@ -327,6 +364,7 @@ function makeFullStopwordsList() {
     return fullStopwordsList;
 }
 
+
 function removeStopWords(tokens, stopwordsList) {
     let filteredTokens = tokens.filter((token) => !stopwordsList.includes(token))
     return filteredTokens
@@ -342,7 +380,8 @@ function scoreText(tokens, lexicon) {
     for (let i = 0; i < tokens.length; i++) {
         let token = tokens[i];
         if (terms.includes(token)) {
-            let score = lexicon[token];
+            let score = lexicon[token].score;
+            let lexiconName = lexicon[token].lexicon;
             let priorToken = tokens[i-1];
 
             if (priorToken == "not") { // makes score negative if word is preceded by "not"
@@ -353,7 +392,7 @@ function scoreText(tokens, lexicon) {
             }
 
             textScore = textScore + score;
-            scoredWords.push([token, score]);
+            scoredWords.push({"token": token, "score": score, "lexicon": lexiconName});
         }
     }
     return [textScore, scoredWords];
@@ -414,7 +453,7 @@ function returnFullText(text, textSection, scoredWords) {
         let currentWordToken = lowerCaseAndRemovePunctuationOfText(currentWord);
 
         if (copyScoredWords.length > 0) { // check b/c if we don't have any more words with scores, no point doing this
-            let currentToken = copyScoredWords[0][0]; // get the first part of the first line in scoredWords (b/c format is "word, 5")
+            let currentToken = copyScoredWords[0].token;
 
             if (currentToken.split(' ')[0] == "not") { // if token was 2 words, and the first is "not"
                 currentWordToken = "not " + currentWordToken;
@@ -424,12 +463,12 @@ function returnFullText(text, textSection, scoredWords) {
                     copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
 
                     currentWord = fullTextTokens[i - 1] + " " + currentWord;
-                    let score = copyScoredWords[0][1];
+                    let score = copyScoredWords[0].score;
                     toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
                 }
 
             } else if (currentWordToken == currentToken) {
-                let score = copyScoredWords[0][1];
+                let score = copyScoredWords[0].score;
                 toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
                 copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
             }
