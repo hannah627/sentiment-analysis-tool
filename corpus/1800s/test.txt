@@ -20,3 +20,5 @@ your
 yours
 
 Also, I want to test bigrams, because I do not want to have to deal with issues around phrases like "not like".
+
+I also want to see how scoring works with words like solace .

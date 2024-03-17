@@ -103,14 +103,18 @@
                         </span>
                         <span>
                             <input type="checkbox" id="lexicon3" name="lexicon" value="custom">
-                            <label for="lexicon3">Custom Lexicon</label>
+                            <label for="lexicon3" class="toolTip">
+                                Custom Lexicon
+                                <div class="toolTipText">
+                                    <p>The custom lexicon allows you to input your own terms and scores. If used in conjunction with either AFINN and/or the Historical Lexicon, we recommend using a score range of 5 to -5, with 5 being the most positive and -5 being the most negative, so that all terms and scores are on the same scale. The custom lexicon can also be used to overwrite scores in either of the other lexicons - simply enter the term and the new score you'd like for it, separated by a comma.</p>
+                                </div>
+                            </label>
                         </span>
                         <section id="customLexiconSection">
-                            <label for="customLexiconInput">Enter a custom lexicon below:</label>
-                            <textarea id="customLexiconInput"></textarea>
-
-                            <label for="customLexiconFile">Or select a file containing your lexicon:</label>
-                            <input type="file" name="customLexiconFile" id="customLexiconFile">
+                            <h4>Custom Lexicon</h4>
+                            <label for="customLexiconFileInput">Select a CSV file containing your lexicon:</label>
+                            <input type="file" name="customLexiconFileInput" id="customLexiconFileInput" accept=".csv">
+                            <p>If you don't already have a custom lexicon file, <a href="./lexicons/custom_lexicon.csv" download="custom_lexicon">download and use this template CSV file.</a></p>
                         </section>
                     </section>
                 </section>
@@ -148,12 +152,12 @@
                                     <tr>
                                         <th scope="col">
                                             <span class='toolTip'>Comparative Score
-                                                <span class='toolTipText'>The Total Score divided by the number of words</span>
+                                                <span class='toolTipText'>The sum of the scores of the scored words, divided by the total number of words in the document</span>
                                             </span>
                                         </th>
                                         <th scope="col">
                                             <span class='toolTip'>Total Score
-                                                <span class='toolTipText'>The sum of the scores of all scored tokens</span>
+                                                <span class='toolTipText'>The sum of the scores of all scored words</span>
                                             </span>
                                         </th>
 

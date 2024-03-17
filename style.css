@@ -26,6 +26,10 @@ th {
     accent-color: #4F772D;
 }
 
+a {
+    color: #4F772D;
+}
+
 button {
     background-color: #709041;
 }
@@ -281,7 +285,7 @@ input::file-selector-button {
     left: 50%;
 }
 
-.toolTip .toolTipText {
+.toolTip .toolTipText, .scoredWord .toolTipText {
     width: 200px;
     margin-left: -100px; /* needs to be negative */
 }
@@ -293,11 +297,6 @@ input::file-selector-button {
 
 .toolTip .toolTipText a:hover {
     color: rgb(228, 224, 224);
-}
-
-.scoredWord .toolTipText {
-    width: 120px;
-    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 #optionsSection .toolTip .toolTipText {

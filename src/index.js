@@ -51,8 +51,11 @@ function init() {
     // adding general event listeners (options section button, main text input)
     id("optionsSectionHeader").addEventListener("click", () =>
         { toggleDropDownSectionVisibility("optionsSection", "optionsSectionHeader", "toggleOptionsSectionBtn", "flex") });
+
+    id("customLexiconFileInput").addEventListener("change", (e) => { customLexiconFileInput(e) });
+
     id("input").addEventListener("input", processInputtedText);
-    id("inputFile").addEventListener("change", (e) => { processInputtedFile(e) });
+    id("inputFile").addEventListener("change", (e) => { processInputtedTextFile(e) });
 
     // finding lexicon option checkboxes and adding event listeners to them
     let lexiconOptions = document.querySelectorAll('input[name=lexicon]');
@@ -110,6 +113,35 @@ function processFileStopwords(list, resultList) {
 
 
 
+function customLexiconFileInput(e) {
+    let file = e.currentTarget.files[0];
+    let reader = new FileReader();
+
+    reader.onload = (function(e) {
+        let text = e.target.result;
+        processLexiconCSV(text, customLexiconObj);
+    });
+    reader.readAsText(file);
+}
+
+function processLexiconCSV(text, resultsObj) {
+    let lines = text.split('\n');
+    lines.forEach(line => {
+        let columns = line.split(',');
+        let token = columns[0];
+        let score = columns[1];
+        resultsObj[token] = {
+            "score": score,
+            "lexicon": "Custom"
+        }
+    });
+}
+
+
+
+
+
+
 function toggleElementVisibility(elementID, displayType) {
     let element = id(elementID);
     if (element.style.display === "none") {
@@ -150,7 +182,7 @@ function processInputtedText() {
 }
 
 
-function processInputtedFile(e) {
+function processInputtedTextFile(e) {
     tableSection.style.display = "none";
     clearResultsSection();
     totalFilesProcessed = 0;
@@ -338,15 +370,18 @@ function updateSelectedLexicons() {
     currentLexicons = selectedLexicons;
 }
 
-function makeFullLexicon() { // does not yet include custom lexicon
+function makeFullLexicon() {
     let fullLexicon = {};
     if (currentLexicons.includes('AFINN_en')) {
         fullLexicon = {...AFINN_obj};
     }
     if (currentLexicons.includes('historical')) {
-        fullLexicon = {...fullLexicon,  ...historicalLexiconObj}; // does this overwrite afinn entries? i hope so, but should test
+        // this does overwrite the score in the afinn lexicon, if the same word appears in both
+        fullLexicon = {...fullLexicon,  ...historicalLexiconObj};
     }
-    // something about what to do about custom lexicons
+    if (currentLexicons.includes('custom')) {
+        fullLexicon = {...fullLexicon, ...customLexiconObj}
+    }
     return fullLexicon;
 }
 
@@ -366,8 +401,8 @@ function makeFullStopwordsList() {
 
 
 function removeStopWords(tokens, stopwordsList) {
-    let filteredTokens = tokens.filter((token) => !stopwordsList.includes(token))
-    return filteredTokens
+    let filteredTokens = tokens.filter((token) => !stopwordsList.includes(token));
+    return filteredTokens;
 }
 
 
@@ -463,13 +498,11 @@ function returnFullText(text, textSection, scoredWords) {
                     copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
 
                     currentWord = fullTextTokens[i - 1] + " " + currentWord;
-                    let score = copyScoredWords[0].score;
-                    toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
+                    toAppend = createScoredWordToolTip(currentWord, copyScoredWords[0]);
                 }
 
             } else if (currentWordToken == currentToken) {
-                let score = copyScoredWords[0].score;
-                toAppend = "<span class='scoredWord'>" + currentWord + "<span class='toolTipText'> Score: " + score + "</span></span>";
+                toAppend = createScoredWordToolTip(currentWord, copyScoredWords[0]);
                 copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
             }
         }
@@ -478,6 +511,13 @@ function returnFullText(text, textSection, scoredWords) {
     textSection.innerHTML = textSectionContent.join(' ');
 }
 
+function createScoredWordToolTip(currentWord, entry) {
+    let score = entry.score;
+    let lexiconName = entry.lexicon;
+    let toolTipText = "<div class='toolTipText'><p>Score: " + score + "</p><p>Lexicon: " + lexiconName + "</p></div>";
+    let toAppend = "<span class='scoredWord'>" + currentWord + toolTipText + "</span>";
+    return toAppend;
+}
 
 
 
