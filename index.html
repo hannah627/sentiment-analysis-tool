@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js" charset="utf-8"></script>
 </head>
     <body>
         <header>
@@ -179,9 +180,8 @@
                     </section>
 
                     <section id="tableSection" class="subSection">
-                        <div>
-                            <h3>Scored Terms</h3>
-                        </div>
+                        <h3>Scored Terms:</h3>
+                        <div id="singleInputTokensGraphContainer" class="scoredTokensGraph"></div>
                         <div class="tableContainer">
                             <table id="scoresTable">
                                 <colgroup span="3"></colgroup>
@@ -228,5 +228,7 @@
         </footer>
         <script src="src/index.js" type="module"></script>
         <script src="src/creating_elements.js" type="module"></script>
+        <script src="src/graphing.js" type="module"></script>
+        <script src="src/utils.js" type="module"></script>
     </body>
 </html>

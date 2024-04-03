@@ -6,6 +6,10 @@ import {
     createDropDownHeader
 } from './creating_elements.js';
 
+import { graphTokenScores } from './graphing.js';
+
+import { id, gen, toggleElementVisibility, toggleDropDownSectionVisibility } from './utils.js'
+
 
 const AFINN_LINK = "lexicons/afinn-lexicon-en-165.txt";
 const HISTORICAL_LINK = "lexicons/lexicon-v1.txt";
@@ -142,35 +146,6 @@ function processLexiconCSV(text, resultsObj) {
 
 
 
-function toggleElementVisibility(elementID, displayType) {
-    let element = id(elementID);
-    if (element.style.display === "none") {
-        element.style.display = displayType;
-    } else {
-        element.style.display = "none"
-    }
-}
-
-function toggleDropDownSectionVisibility(sectionContentID, sectionHeaderID, arrowButtonID, displayType) {
-    let sectionContent = id(sectionContentID);
-    let sectionHeader = id(sectionHeaderID);
-    let arrowButton = id(arrowButtonID);
-
-    if (sectionContent.style.display === "none") {
-        sectionContent.style.display = displayType;
-        sectionHeader.style.borderRadius = "15px 15px 0px 0px";
-        arrowButton.classList.remove('down');
-        arrowButton.classList.add('up');
-
-    } else {
-        sectionContent.style.display = "none";
-        sectionHeader.style.borderRadius = "15px";
-
-        arrowButton.classList.remove('up');
-        arrowButton.classList.add('down');
-    }
-}
-
 
 
 
@@ -189,21 +164,32 @@ function processInputtedTextFile(e) {
     totalCorpusScore = 0;
 
     let files = e.currentTarget.files;
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        let reader = new FileReader();
-        reader.onload = (function() {
-            if (files.length == 1) {
-                return function() { singleFileOnLoadHandler(this) }
-            }
-            else {
-                return function() {
-                    onLoadHandler(this, file, files.length);
-                    onLoadEndHandler(files.length);
-               };
-            }
-        })(file);
-        reader.readAsText(file);
+    let userContinuing = true;
+
+    // limit the maximum number of files that will be processed, or at least give a warning about bad performance
+    if (files.length > 3) {
+        userContinuing = window.confirm("The more files you upload, the worse performance will be");
+    }
+
+    if (userContinuing) {
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let reader = new FileReader();
+            reader.onload = (function() {
+                if (files.length == 1) {
+                    return function() { singleFileOnLoadHandler(this) }
+                }
+                else {
+                    return function() {
+                        onLoadHandler(this, file);
+                        onLoadEndHandler(files.length);
+                   };
+                }
+            })(file);
+            reader.readAsText(file);
+        }
+    } else { // user received warning about number of uploaded files and clicked "cancel"
+        e.currentTarget.value = '';
     }
 }
 
@@ -249,6 +235,7 @@ function onLoadEndHandler(numFiles) {
 function clearResultsSection () {
     id("verdict").innerHTML = "";
     id("textResult").innerHTML = "";
+    id("multipleFilesResults").innerHTML = "";
 }
 
 
@@ -282,7 +269,7 @@ function processOneOfMultipleFiles(fileName, fileText) {
 function createFileResultsSection(fileName, textScore, totalNumTokens, text, scoredWords) {
     let resultsHeader = createFileResultsHeader(fileName, textScore, totalNumTokens);
 
-    let resultsContainer = gen("section"); // make this contain two more dropdowns? one for full text, one for seeing score tokens?
+    let resultsContainer = gen("section");
     resultsContainer.classList.add("fileResultsContainer");
     resultsContainer.id = fileName + "ResultsContainer";
     resultsContainer.style.display = "none"; // file results hidden by default
@@ -291,7 +278,7 @@ function createFileResultsSection(fileName, textScore, totalNumTokens, text, sco
     let summarySection = createSummarySection(textScore, totalNumTokens, scoredWords.length)
     resultsContainer.appendChild(summarySection);
 
-    let tokenTableSection = createTokenTableSection(fileName);
+    let tokenTableSection = createTokenTableSection(fileName, scoredWords);
     resultsContainer.appendChild(tokenTableSection);
 
     // do the dropwdown for full text
@@ -319,7 +306,7 @@ function createFileResultsSection(fileName, textScore, totalNumTokens, text, sco
     returnFullText(text, fullTextContainer, scoredWords);
     fullTextContainer.style.display = "none";
 
-    return fullTextContainer
+    return fullTextContainer;
 }
 
 
@@ -439,9 +426,8 @@ function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
     let verdictSection = id("verdict");
     let summaryTableContainer = id("singleInputSummaryTableContainer");
 
+    let graphContainer = id("singleInputTokensGraphContainer");
     let tableSection = id("tableSection");
-
-        // if scoredWords.length > 10 (or something), then put table into dropdown?
 
     if (scoredWords.length > 0) {
         verdictSection.style.display = "none";
@@ -457,7 +443,13 @@ function appendResultsToVerdictSection(textScore, scoredWords, totalNumTokens) {
         addRowsToTokenTable(scoredWords, 'scoresTable');
         tableSection.style.display = "flex";
 
+        graphContainer.innerHTML = ""; // deletes the existing graph, if there is one
+        graphTokenScores(graphContainer, scoredWords);
+        graphContainer.style.display = "flex";
+
     } else {
+        graphContainer.style.display = "none";
+        graphContainer.innerHTML = ""; // deletes the existing graph, if there is one
         tableSection.style.display = "none";
         summaryTableContainer.style.display = "none";
 
@@ -517,28 +509,4 @@ function createScoredWordToolTip(currentWord, entry) {
     let toolTipText = "<div class='toolTipText'><p>Score: " + score + "</p><p>Lexicon: " + lexiconName + "</p></div>";
     let toAppend = "<span class='scoredWord'>" + currentWord + toolTipText + "</span>";
     return toAppend;
-}
-
-
-
-
-
-
-
-/**
- * a helper function to make returning an element based on id easier and faster
- * @param {string} idName - the id of the element to be located
- * @returns {Element} with id idName
- */
-export function id(idName) {
-    return document.getElementById(idName);
-}
-
-/**
- * a helper function to make creating an element easier and faster
- * @param {string} tagName - the name of the element to create
- * @returns {Element} of type tagName
- */
-export function gen(tagName) {
-    return document.createElement(tagName);
 }

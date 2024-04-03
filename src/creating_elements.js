@@ -1,4 +1,5 @@
-import {id, gen} from './index.js'
+import { graphTokenScores } from './graphing.js';
+import { id, gen, toggleDropDownSectionVisibility } from './utils.js'
 
 
 export function createFileResultsHeader(fileName, textScore, totalNumTokens) {
@@ -151,17 +152,37 @@ function createSummaryTable(textScore, totalNumTokens, numScoredTokens) {
 
 
 // TOKEN TABLES
-export function createTokenTableSection(fileName) {
+export function createTokenTableSection(fileName, scoredWords) {
     let tableSection = gen("section");
-    let heading = gen("h3");
-    heading.textContent = "Scored Terms";
-    tableSection.appendChild(heading);
-
     let tableContainer = createTokenTable(fileName);
-    tableSection.appendChild(tableContainer);
+
+    if (scoredWords.length > 50) { // when there are a lot of scored terms, put it in a dropdown
+        let tokenTableDropDownHeader = createDropDownHeader("Scored Terms", fileName + "TokenTableDropDown");
+        tableSection.appendChild(tokenTableDropDownHeader);
+
+        let tokenTableDropDownContainer = gen("section");
+        tokenTableDropDownContainer.id = fileName + "TokenTableDropDownContainer";
+        graphTokenScores(tokenTableDropDownContainer, scoredWords); // put graph above the dropdown for the token table
+        tokenTableDropDownContainer.appendChild(tableContainer);
+
+        tokenTableDropDownContainer.style.display = "none";
+        tableSection.appendChild(tokenTableDropDownContainer);
+
+        tokenTableDropDownHeader.addEventListener("click", () => {
+            toggleDropDownSectionVisibility(fileName + "TokenTableDropDownContainer", fileName + "TokenTableDropDownHeader", fileName + "TokenTableDropDownArrow", "block")
+        })
+
+    } else {
+        let heading = gen("h3");
+        heading.textContent = "Scored Terms";
+        tableSection.appendChild(heading);
+        graphTokenScores(tableSection, scoredWords);
+        tableSection.appendChild(tableContainer);
+    }
 
     return tableSection;
 }
+
 
 function createTokenTable(fileName) {
     let container = gen("div");
@@ -216,18 +237,6 @@ function findPositiveAndNegativeTerms(scoredWords) {
             wordsSeen.push(entry.token);
         }
     }
-
-    // scoredWords.forEach((entry) => {
-    //     let [token, score] = entry;
-    //     if (!wordsSeen.includes(token)) { // adjusted so it only displays each word once
-    //         if (score > 0) {
-    //             positiveWords.push([token, score]);
-    //         } else {
-    //             negativeWords.push([token, score]);
-    //         }
-    //         wordsSeen.push(token);
-    //     }
-    // })
     return [positiveWords, negativeWords];
 }
 
@@ -259,6 +268,7 @@ export function addRowsToTokenTable(scoredWords, tableID) {
     }
     table.appendChild(tbody);
 }
+
 
 function createTokenTableCells(entry, row) {
     let termCell = gen("td");
