@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property="article:tag" content="sentiment analysis" />
+    <meta property="article:tag" content="sentiment" />
+    <meta property="article:tag" content="AFINN" />
+    <meta property="article:tag" content="lexicon" />
+
     <title>Sentiment Analysis Tool</title>
 
     <link rel="stylesheet" href="style.css">
@@ -25,7 +31,24 @@
             <article>
                 <section id="explanationSection">
                     <h2>What This Is</h2>
-                    <p>An explanation of what this is and how it works</p>
+                    <div class="explanationSubSections">
+                        <p>This is a tool to perform sentiment analysis on text(s), explore why and how certain scores were given, and edit
+                        those scores as necessary.</p>
+                    </div>
+                    <div class="explanationSubSections">
+                        <p>First, choose which lexicons you'd like to apply (words and scores you'd like to look for), along with words you
+                        don't want scored (stop words), in the Options section.</p>
+                        <p>Next, upload the file or files you'd like scored, or copy and paste the text into the given text box.</p>
+                        <p>Then, explore your results by looking at the graphs of document or token scores, and the full text of whatever you
+                        uploaded, which will have scored words highlighted. Hover over those scored words to see their score and the lexicon
+                        the score came from.</p>
+                    </div>
+                    <div class="explanationSubSections">
+                        <p>If you want to adjust the score of one or more words, download the template lexicon from the Options section and
+                        input the word and your preferred score, then save it, upload it as a custom lexicon, and re-run the tool to see
+                        your changes reflected. If you want one or more words to not be scored, just download the template stop words list
+                        from the Options section, add the word(s), save it, and upload it as a custom stop words list.</p>
+                    </div>
                 </section>
 
 
@@ -96,6 +119,7 @@
                                 Historical Lexicon
                                 <div class="toolTipText">
                                     <p>The Historical Lexicon is one in the same vein as AFINN, but created a few years later by extracting words with emotional valence from historical, English-language texts from the 1800s and 1900s.</p>
+                                    <p>This lexicon was created by Hannah Burrows, as part of her university capstone project, along with this site/tool.</p>
                                     <p>
                                         <a href="lexicons/lexicon-v1.txt">See full list of words</a>
                                     </p>
@@ -107,7 +131,8 @@
                             <label for="lexicon3" class="toolTip">
                                 Custom Lexicon
                                 <div class="toolTipText">
-                                    <p>The custom lexicon allows you to input your own terms and scores. If used in conjunction with either AFINN and/or the Historical Lexicon, we recommend using a score range of 5 to -5, with 5 being the most positive and -5 being the most negative, so that all terms and scores are on the same scale. The custom lexicon can also be used to overwrite scores in either of the other lexicons - simply enter the term and the new score you'd like for it, separated by a comma.</p>
+                                    <p>The custom lexicon allows you to input your own terms and scores. If used in conjunction with either AFINN and/or the Historical Lexicon, we recommend using a score range of 5 to -5, with 5 being the most positive and -5 being the most negative, so that all terms and scores are on the same scale.</p>
+                                    <p>The custom lexicon can also be used to overwrite scores in either of the other lexicons - simply enter the term and the new score you'd like for it, separated by a comma.</p>
                                 </div>
                             </label>
                         </span>
@@ -224,7 +249,7 @@
 
         </main>
         <footer>
-            <p></p>
+            <p>Created by Hannah Burrows as part of her University of Washington capstone project, in the Winter and Spring of 2024.</p>
         </footer>
         <script src="src/index.js" type="module"></script>
         <script src="src/creating_elements.js" type="module"></script>

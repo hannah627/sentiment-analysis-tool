@@ -6,7 +6,7 @@ import {
     createDropDownHeader
 } from './creating_elements.js';
 
-import { graphTokenScores } from './graphing.js';
+import { graphTokenScores, graphDocumentScores } from './graphing.js';
 
 import { id, gen, toggleElementVisibility, toggleDropDownSectionVisibility } from './utils.js'
 
@@ -31,6 +31,7 @@ let currentStopwords = ['nltk', 'tool'];
 
 let totalFilesProcessed = 0;
 let totalCorpusScore = 0;
+let documentScores = [];
 
 
 // when the page loads, call "init"
@@ -208,8 +209,9 @@ function onLoadHandler(reader, file) {
     let file_text = reader.result;
     id("singleInputResultsSection").style.display = "none";
     id("multipleInputsResultsSection").style.display = "block";
-    let score = processOneOfMultipleFiles(file.name, file_text);
-    totalCorpusScore = totalCorpusScore + score;
+    let documentObj = processOneOfMultipleFiles(file.name, file_text);
+    documentScores.push(documentObj); // push to global list of objs
+    totalCorpusScore = totalCorpusScore + (documentObj.score * 1); // needs to be mult. by 1 to see it as a number
 }
 
 
@@ -219,12 +221,19 @@ function onLoadEndHandler(numFiles) {
         let resultsSection = id("multipleFilesResults");
 
         let summaryText = gen("p");
-        summaryText.textContent = "The results for all files is shown below:"
+        summaryText.textContent = "The results for all files are shown below:"
         resultsSection.prepend(summaryText);
 
+        // let graph = graphDocumentScores(documentScores, resultsSection);
+        // resultsSection.prepend(graph);
+        graphDocumentScores(documentScores, resultsSection);
+
+
         let corpusResultsText = gen("p");
-        corpusResultsText.textContent = "Overall corpus score: " + (totalCorpusScore / numFiles).toFixed(3);
+        let toolTip = "<span class='toolTip'>corpus score<span class='toolTipText'>The average of each document's comparative score</span></span>";
+        corpusResultsText.innerHTML = "Overall " + toolTip + ": " + (totalCorpusScore / numFiles).toFixed(3);
         resultsSection.prepend(corpusResultsText);
+
         id("multipleInputsResultsSection").scrollIntoView({behavior: 'smooth'});
     };
 }
@@ -261,7 +270,11 @@ function processOneOfMultipleFiles(fileName, fileText) {
     // add rows to table up here, b/c table needs to be in the DOM to find it by ID, so sections need to be appended
     addRowsToTokenTable(scoredWords, fileName + "TokenTable");
 
-    return (textScore / totalNumTokens);
+    let percentTokensScored = ((scoredWords.length / totalNumTokens) * 100).toFixed(3);
+    let score = (textScore / totalNumTokens).toFixed(3);
+    let documentObj = {"file": fileName, "score": score, "percentTokensScored": percentTokensScored};
+
+    return documentObj;
 }
 
 

@@ -38,16 +38,23 @@ article > section, .tableContainer {
     background-color: #BECE7A;
 }
 
+
+
+.explanationSubSections {
+    background-color: #D5E18C;
+}
+
+.explanationSubSections:nth-child(odd) {
+    background-color: #ECF39E;
+}
+
+.explanationSubSections:last-child,
 .subSection,
 .fileResultsHeader,
 .fileResultsContainer {
     background-color: #F2F7BC;
 }
 
-/* .summaryTableContainer td:nth-child(odd),
-#scoresTable tr:nth-child(odd) td {
-    background-color: #eef2c1;
-} */
 
 td {
     background-color: #F5F9CB;
@@ -67,6 +74,10 @@ body, textarea {
 .scoredWord .toolTipText,
 th {
     color: white;
+}
+
+footer {
+    color: #887c69;
 }
 
 
@@ -118,12 +129,15 @@ main, header {
     align-items: center;
 }
 
-article {
-    width: 80%;
+article, footer {
     margin-top: 1rem;
     padding-left: 5%;
     padding-right: 5%;
     padding-bottom: 5%;
+}
+
+article {
+    width: 80%;
 }
 
 .large-label {
@@ -152,6 +166,24 @@ article > section {
     border-radius: 15px;
     margin-top: 1.5rem;
 }
+
+
+.explanationSubSections {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.explanationSubSections>p {
+    margin-top: 0.25rem;
+    margin-bottom: 0px;
+}
+
+#explanationSection>h2 {
+    margin-bottom: 0.25rem;
+}
+
+
 
 #optionsSection, .fileResultsContainer {
     border-radius: 0px 0px 15px 15px;
@@ -397,10 +429,7 @@ th {
 }
 
 
-.scoredTokensGraph {
-    /* width: 600px;
-    height: 400px; */
-    /* background-color: white; */
+.scoredTokensGraph, .corpusScoresGraph {
     display: flex;
     justify-content: center;
     align-items: center;
