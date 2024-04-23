@@ -14,14 +14,19 @@ header, .superColumnHeader, .superRowHeader {
     background-color: #31572C;
 }
 
-/* .summaryTableContainer th:not(.superRowHeader):nth-child(even) {
-    background-color: #40672D;
-    background-color: #476929;
-} */
+nav li a:hover:not(:has(img)), #activeNavbarLink:hover {
+    background-color: #3b5b1f;
+}
+
+#activeNavbarLink {
+    background-color: #456924;
+}
+
 
 input::file-selector-button,
 input:checked,
-th {
+th,
+nav ul {
     background-color: #4F772D;
     accent-color: #4F772D;
 }
@@ -119,6 +124,39 @@ header {
     padding: 0.5em;
     color: white;
 }
+
+
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+nav li {
+    float: left;
+}
+
+nav li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+nav img {
+    width: 25px;
+    height: 25px;
+}
+
+nav a:has(img) {
+    padding-bottom: 4px;
+    padding-top: 12px;
+}
+
+
 
 main, header, article, #inputSection > section {
     display: flex;
