@@ -1,9 +1,11 @@
 import { id, gen } from './utils.js'
 
-export function graphTokenScores(location, scoredWords) {
+export function graphTokenScores(location, scoredWords, fileName) {
 
+    let graphContainer = createGraphContainer("tokenScore", fileName);
     let graph = gen("div");
     graph.classList.add("scoredTokensGraph");
+    graph.id = fileName + "scoredTokensGraph";
 
     let scoresCounts = {};
     for (let i = 0; i < scoredWords.length; i++) {
@@ -49,9 +51,13 @@ export function graphTokenScores(location, scoredWords) {
     }
 
     Plotly.newPlot(graph, data, layout);
+    graphContainer.appendChild(graph);
 
+    let tableView = createTableVerOfTokenGraph(scoresCounts);
+    tableView.id = fileName + "scoredTokensTable";
+    graphContainer.appendChild(tableView);
 
-    location.appendChild(graph);
+    location.appendChild(graphContainer);
 }
 
 
@@ -60,10 +66,9 @@ export function graphTokenScores(location, scoredWords) {
 
 
 export function graphDocumentScores(documentScores, location) {
+    let graphContainer = createGraphContainer("documentScore", "documentScore");
     let graph = gen("div");
-    graph.classList.add("corpusScoresGraph");
-
-    console.log(documentScores)
+    graph.id = "corpusScoresGraph";
 
     let xPoints = [];
     let yPoints = [];
@@ -85,12 +90,7 @@ export function graphDocumentScores(documentScores, location) {
             marker: {
                 size: 16,
                 color: '#193819',
-                // gradient: { // does a gradient on the marker
-                //     color: '#193819',
-                //     type: 'horizontal'
-                // }
             },
-            // fill: "tonextx", // can't seem to predict how fills work
             text: labelsList,
             type: 'scatter',
             hovertemplate: '<b><i>%{text}</i></b>' +
@@ -101,6 +101,8 @@ export function graphDocumentScores(documentScores, location) {
 
     let layout = {
         title: "Distribution of Document Scores",
+        width: 600,
+        height: 400,
         xaxis: {
             title: "Score",
             range: [-1.25, 1.25],
@@ -129,7 +131,13 @@ export function graphDocumentScores(documentScores, location) {
         };
     });
 
-    location.prepend(graph); // need to add graph to site before we can query select for points
+    graphContainer.appendChild(graph);
+
+    let tableView = createTableVerOfDocumentScoresGraph(documentScores);
+    tableView.id = "corpusScoresTable";
+    graphContainer.appendChild(tableView);
+
+    location.prepend(graphContainer); // need to add graph to site before we can query select for points
 
     // attempt to add event listeners to points so that clicking them could take user to the data for that document
     // let points = document.querySelectorAll("path.point");
@@ -143,3 +151,196 @@ export function graphDocumentScores(documentScores, location) {
 
     // return graph;
 }
+
+
+
+
+
+function createGraphContainer(type, nameForID) {
+    let graphContainer = gen("div");
+    graphContainer.classList.add("graphContainer");
+    graphContainer.id = nameForID + "_graphContainer";
+
+    let graphOptionsContainer = gen("div");
+    graphOptionsContainer.classList.add("graphOptionsContainer");
+    let graphTitle = ""; // need it to exist before the if/else, but don't know what it should be until if/else
+
+    if (type == "documentScore") {
+        graphTitle = gen("h3");
+        graphTitle.textContent = "Distribution of Document Scores";
+    } else {
+        graphTitle = gen("h4");
+        graphTitle.textContent = "Distribution of Scores";
+    }
+    graphOptionsContainer.appendChild(graphTitle);
+
+    let graphOptionsButtonsContainer = gen("div");
+    graphOptionsButtonsContainer.classList.add("graphOptionsButtonsContainer");
+
+    let graphButton = gen("button");
+    graphButton.textContent = "View as Graph";
+    graphButton.id = nameForID + "_viewGraphBtn";
+    graphButton.addEventListener("click", (e) => { graphButtonClick(e, type) })
+    graphOptionsButtonsContainer.appendChild(graphButton);
+
+
+    let tableButton = gen("button");
+    tableButton.textContent = "View as Table";
+    tableButton.id = nameForID + "_viewTableBtn";
+    tableButton.addEventListener("click", (e) => { tableButtonClick(e, type) })
+    graphOptionsButtonsContainer.appendChild(tableButton);
+
+    graphOptionsContainer.appendChild(graphOptionsButtonsContainer);
+    graphContainer.appendChild(graphOptionsContainer);
+
+    return graphContainer;
+}
+
+
+
+
+function graphButtonClick(e, type) { // when user clicks "View as Graph"
+
+    if (type == "documentScore") {  // there is only one document scores graph
+        if (id("corpusScoresGraph").style.display == "none") { // if graph view is hidden, display it
+            id("corpusScoresGraph").style.display = "flex";
+            id("corpusScoresTable").style.display = "none";
+        }
+    } else { // if we're clicking a tokenScore graph, need to deal with finding unknown ID
+        let fileName = e.target.id.substring(0, e.target.id.length - 13); // removing '_viewGraphBtn'
+        if (id(fileName + "scoredTokensGraph").style.display == "none") {
+            id(fileName + "scoredTokensGraph").style.display = "flex";
+            id(fileName + "scoredTokensTable").style.display = "none";
+        }
+    }
+
+
+}
+
+function tableButtonClick(e, type) { // when user clicks "View as Table"
+
+    if (type == "documentScore") { // there is only one document scores graph
+        if (id("corpusScoresGraph").style.display != "none") { // if graph view is visible, hide it
+            id("corpusScoresGraph").style.display = "none";
+            id("corpusScoresTable").style.display = "flex";
+        }
+    } else {
+        let fileName = e.target.id.substring(0, e.target.id.length - 13); // removing '_viewTableBtn'
+        if (id(fileName + "scoredTokensGraph").style.display != "none") {
+            id(fileName + "scoredTokensGraph").style.display = "none";
+            id(fileName + "scoredTokensTable").style.display = "flex";
+        }
+    }
+}
+
+
+
+
+
+function createTableVerOfTokenGraph(scoresCounts) {
+    let tableView = gen("div");
+    let table = createTableWithHeadings(["Score", "Number of Words With That Score"]);
+
+    let tableBody = gen("tbody");
+    for (let i = 0; i < Object.keys(scoresCounts).length; i++) {
+        let rowContainer = gen("tr");
+        let score = Object.keys(scoresCounts)[i];
+        let count = Object.values(scoresCounts)[i];
+
+        let scoreCell = gen("td");
+        scoreCell.textContent = score;
+        rowContainer.appendChild(scoreCell);
+
+        let countCell = gen("td");
+        countCell.textContent = count;
+        rowContainer.appendChild(countCell)
+
+        tableBody.appendChild(rowContainer);
+    }
+
+    table.appendChild(tableBody);
+    tableView.appendChild(table);
+    tableView.classList.add("tableContainer");
+    tableView.style.display = "none";
+    return tableView;
+}
+
+
+function createTableVerOfDocumentScoresGraph(documentScores) {
+    let tableView = gen("div");
+    let table = createTableWithHeadings(["Document", "Score", "Percentage of Tokens Scored"]);
+
+    let tableBody = gen("tbody");
+    for (let i = 0; i < documentScores.length; i++) {
+        let rowContainer = gen("tr");
+        let data = documentScores[i];
+
+        let docCell = gen("td");
+        docCell.textContent = data.file;
+        rowContainer.appendChild(docCell);
+
+        let scoreCell = gen("td");
+        scoreCell.textContent = data.percentTokensScored;
+        rowContainer.appendChild(scoreCell);
+
+        let countCell = gen("td");
+        countCell.textContent = data.score;
+        rowContainer.appendChild(countCell);
+
+        tableBody.appendChild(rowContainer);
+    }
+    table.appendChild(tableBody);
+
+    tableView.appendChild(table);
+    tableView.classList.add("tableContainer");
+    tableView.style.display = "none";
+    return tableView;
+}
+
+
+
+
+
+
+function createTableWithHeadings(listOfHeadings) {
+    let table = gen("table");
+    let tableHeading = gen("thead");
+    let tableHeadingRow = gen("tr");
+
+    for (let i = 0; i < listOfHeadings.length; i++) {
+        let headingCell = gen("th");
+        headingCell.textContent = listOfHeadings[i];
+        tableHeadingRow.appendChild(headingCell)
+    }
+
+    tableHeading.appendChild(tableHeadingRow);
+    table.appendChild(tableHeading);
+
+    return table;
+}
+
+// function createTableBody(numRows, cellData) {
+//     let tableBody = gen("tbody");
+//     for (let i = 0; i < numRows; i++) {
+//         let rowContainer = gen("tr");
+
+
+
+
+
+
+//         let score = Object.keys(scoresCounts)[i];
+//         let count = Object.values(scoresCounts)[i];
+
+//         let scoreCell = gen("td");
+//         scoreCell.textContent = score;
+//         rowContainer.appendChild(scoreCell);
+
+//         let countCell = gen("td");
+//         countCell.textContent = count;
+//         rowContainer.appendChild(countCell)
+
+//         tableBody.appendChild(rowContainer);
+//     }
+//     return tableBody;
+// }

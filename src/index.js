@@ -168,8 +168,8 @@ function processInputtedTextFile(e) {
     let userContinuing = true;
 
     // limit the maximum number of files that will be processed, or at least give a warning about bad performance
-    if (files.length > 3) {
-        userContinuing = window.confirm("The more files you upload, the worse performance will be");
+    if (files.length > 50) {
+        userContinuing = window.confirm("Uploading a lot of files may decrease performance/make the tool run slower. You might want to try again and upload less files, or you can keep going, but be aware that it may take longer than usual to finish. What would you like to do?");
     }
 
     if (userContinuing) {
@@ -224,10 +224,7 @@ function onLoadEndHandler(numFiles) {
         summaryText.textContent = "The results for all files are shown below:"
         resultsSection.prepend(summaryText);
 
-        // let graph = graphDocumentScores(documentScores, resultsSection);
-        // resultsSection.prepend(graph);
         graphDocumentScores(documentScores, resultsSection);
-
 
         let corpusResultsText = gen("p");
         let toolTip = "<span class='toolTip'>corpus score<span class='toolTipText'>The average of each document's comparative score</span></span>";

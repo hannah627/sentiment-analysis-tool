@@ -162,7 +162,7 @@ export function createTokenTableSection(fileName, scoredWords) {
 
         let tokenTableDropDownContainer = gen("section");
         tokenTableDropDownContainer.id = fileName + "TokenTableDropDownContainer";
-        graphTokenScores(tokenTableDropDownContainer, scoredWords); // put graph above the dropdown for the token table
+        graphTokenScores(tokenTableDropDownContainer, scoredWords, fileName); // put graph above the dropdown for the token table
         tokenTableDropDownContainer.appendChild(tableContainer);
 
         tokenTableDropDownContainer.style.display = "none";

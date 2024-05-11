@@ -10,7 +10,7 @@
     border-color: #193819 transparent transparent transparent;
 }
 
-header, .superColumnHeader, .superRowHeader {
+header, .superColumnHeader, .superRowHeader, .graphOptionsContainer {
     background-color: #31572C;
 }
 
@@ -24,6 +24,7 @@ nav li a:hover:not(:has(img)), #activeNavbarLink:hover {
 
 
 input::file-selector-button,
+/* .graphOptionsButtonsContainer > button, */
 input:checked,
 th,
 nav ul {
@@ -35,7 +36,7 @@ a {
     color: #4F772D;
 }
 
-button {
+button, #corpusScoresTable {
     background-color: #709041;
 }
 
@@ -65,7 +66,7 @@ td {
     background-color: #F5F9CB;
 }
 
-body, textarea {
+body, textarea, .scoredTokensGraph, #corpusScoresGraph {
     background-color: #F7FBDA;
 }
 
@@ -467,9 +468,51 @@ th {
 }
 
 
-.scoredTokensGraph, .corpusScoresGraph {
+
+
+
+.graphContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.graphContainer > .tableContainer {
+    margin-top: 0px;
+}
+
+.graphOptionsContainer {
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem;
+    margin-bottom: 0px;
+    padding: 0.5rem;
+    color: white;
+}
+
+.graphOptionsContainer h4 {
+    font-size: 1.4rem;
+}
+
+.graphOptionsButtonsContainer {
+    display: flex;
+    flex-direction: row;
+    /* align-items: end; */
+}
+
+.graphOptionsButtonsContainer>button {
+    font-family: 'PT Sans', sans-serif;
+    color: white;
+    font-size: 1rem;
+    margin: 2px;
+}
+
+
+.scoredTokensGraph, #corpusScoresGraph {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 1rem;
+    margin-top: 0px;
 }
