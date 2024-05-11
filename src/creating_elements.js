@@ -163,6 +163,11 @@ export function createTokenTableSection(fileName, scoredWords) {
         let tokenTableDropDownContainer = gen("section");
         tokenTableDropDownContainer.id = fileName + "TokenTableDropDownContainer";
         graphTokenScores(tokenTableDropDownContainer, scoredWords, fileName); // put graph above the dropdown for the token table
+
+        let tokenTableTitle = gen("h4");
+        tokenTableTitle.textContent = "List of Terms and Scores";
+        tokenTableDropDownContainer.appendChild(tokenTableTitle);
+
         tokenTableDropDownContainer.appendChild(tableContainer);
 
         tokenTableDropDownContainer.style.display = "none";
@@ -177,6 +182,11 @@ export function createTokenTableSection(fileName, scoredWords) {
         heading.textContent = "Scored Terms";
         tableSection.appendChild(heading);
         graphTokenScores(tableSection, scoredWords);
+
+        let tokenTableTitle = gen("h4");
+        tokenTableTitle.textContent = "List of Terms and Scores";
+        tableSection.appendChild(tokenTableTitle);
+
         tableSection.appendChild(tableContainer);
     }
 
@@ -187,6 +197,10 @@ export function createTokenTableSection(fileName, scoredWords) {
 function createTokenTable(fileName) {
     let container = gen("div");
     container.classList.add("tableContainer");
+
+    // let tokenTableTitle = gen("h4");
+    // tokenTableTitle.textContent = "List of Terms and Scores";
+    // container.appendChild(tokenTableTitle);
 
     let table = gen("table");
     table.id = fileName + "TokenTable";
