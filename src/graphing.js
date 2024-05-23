@@ -1,4 +1,5 @@
-import { id, gen } from './utils.js'
+import { id, gen } from './utils.js';
+// import * as Tone from "tone";
 
 export function graphTokenScores(location, scoredWords, fileName) {
 
@@ -6,6 +7,7 @@ export function graphTokenScores(location, scoredWords, fileName) {
     let graph = gen("div");
     graph.classList.add("scoredTokensGraph");
     graph.id = fileName + "scoredTokensGraph";
+    graph.role = "img";
 
     let scoresCounts = {};
     for (let i = 0; i < scoredWords.length; i++) {
@@ -15,7 +17,7 @@ export function graphTokenScores(location, scoredWords, fileName) {
         } else {
             scoresCounts[score] = 1; // creates new entry to start tracking that score
         }
-    }
+    };
 
     let trace = {
         x: Object.keys(scoresCounts),
@@ -51,6 +53,11 @@ export function graphTokenScores(location, scoredWords, fileName) {
     }
 
     Plotly.newPlot(graph, data, layout);
+
+    let minMaxText = createMaxMinDescriptionOfScoresGraphs(scoresCounts);
+
+    graph.ariaLabel = "Graph. A bar plot of the count of various scores in the document. Score is on the x-axis, from negative 6 to 6, and count is on the y-axis. There are " + Object.keys(scoresCounts).length + " bars. " + minMaxText;
+
     graphContainer.appendChild(graph);
 
     let tableView = createTableVerOfTokenGraph(scoresCounts);
@@ -69,16 +76,23 @@ export function graphDocumentScores(documentScores, location) {
     let graphContainer = createGraphContainer("documentScore", "documentScore");
     let graph = gen("div");
     graph.id = "corpusScoresGraph";
+    graph.role = "img";
 
     let xPoints = [];
     let yPoints = [];
     let labelsList = [];
 
+    let byXVals = [];
+    let byYVals = [];
+
     for (let i = 0; i < documentScores.length; i++) {
         let documentInfo = documentScores[i];
-        xPoints.push(documentInfo.score);
-        yPoints.push(documentInfo.percentTokensScored);
+        xPoints.push(parseFloat(documentInfo.score));
+        yPoints.push(parseFloat(documentInfo.percentTokensScored));
         labelsList.push(documentInfo.file);
+
+        byXVals.push({"score": parseFloat(documentInfo.score), "file": documentInfo.file})
+        byYVals.push({ "percent": parseFloat(documentInfo.percentTokensScored), "file": documentInfo.file })
     }
 
     var data = [
@@ -120,16 +134,21 @@ export function graphDocumentScores(documentScores, location) {
 
     Plotly.newPlot(graph, data, layout);
 
-    graph.on('plotly_click', function (data) {
-        for (var i = 0; i < data.points.length; i++) {
-            var pn = data.points[i].pointNumber;
-            // let tn = data.points[i].curveNumber;
-            addEventListener("click", (e) => {
-                console.log(pn)
-                console.log(data.points[i]);
-            })
-        };
-    });
+
+    let maxX = Math.max(...xPoints);
+    let maxY = Math.max(...yPoints);
+    let minX = Math.min(...xPoints);
+    let minY = Math.min(...yPoints);
+
+    let docWithMaxX = byXVals.find(item => item.score == maxX).file;
+    let docWithMaxY = byYVals.find(item => item.percent == maxY).file;
+    let docWithMinX = byXVals.find(item => item.score == minX).file;
+    let docWithMinY = byYVals.find(item => item.percent == minY).file;
+
+    let maxPointText = createExtremeValueDescriptionOfCorpusOverview("highest", docWithMaxX, docWithMaxY, maxX, maxY);
+    let minPointText = createExtremeValueDescriptionOfCorpusOverview("lowest", docWithMinX, docWithMinY, minX, minY);
+
+    graph.ariaLabel = "Graph. A scatterplot of document scores by the percentage of terms in the file that were scored. Score is on the x-axis, from negative 1 to 1, and percentage terms scored is on the y-axis, from 0 to " + String(Math.max(...yPoints) + 1) + ". " + maxPointText + " " +  minPointText;
 
     graphContainer.appendChild(graph);
 
@@ -138,18 +157,6 @@ export function graphDocumentScores(documentScores, location) {
     graphContainer.appendChild(tableView);
 
     location.prepend(graphContainer); // need to add graph to site before we can query select for points
-
-    // attempt to add event listeners to points so that clicking them could take user to the data for that document
-    // let points = document.querySelectorAll("path.point");
-    // console.log(points);
-    // for (let i = 0; i < points.length; i++) {
-    //     let point = points[i];
-    //     console.log(point.id)
-    //     // point.id = point.data
-    // }
-
-
-    // return graph;
 }
 
 
@@ -190,6 +197,31 @@ function createGraphContainer(type, nameForID) {
     tableButton.addEventListener("click", (e) => { tableButtonClick(e, type) })
     graphOptionsButtonsContainer.appendChild(tableButton);
 
+
+    let playButton = gen("button");
+    playButton.textContent = "Hear Graph";
+    playButton.id = nameForID + "_playGraph";
+
+    // function playNote() {
+    //     const synth = new Tone.Synth().toDestination();
+    //     synth.triggerAttackRelease("C4", "8n"); // play a note from that synth - 8n = 8th note
+    // }
+    // playButton.addEventListener("click", playNote);
+
+    async function playGraph() {
+        await Tone.start()
+        console.log("audio is ready")
+        // const synth = new Tone.Synth().toDestination();
+        const osc = new Tone.Oscillator().toDestination();
+        osc.frequency.value = "C4"; // start at "C4"
+        osc.frequency.rampTo("C2", 2); // ramp to "C2" over 2 seconds
+        osc.start().stop("+3"); // start the oscillator for 2 seconds
+    }
+    playButton.addEventListener("click", async() => { await playGraph() })
+
+
+    graphOptionsButtonsContainer.appendChild(playButton);
+
     graphOptionsContainer.appendChild(graphOptionsButtonsContainer);
     graphContainer.appendChild(graphOptionsContainer);
 
@@ -200,7 +232,6 @@ function createGraphContainer(type, nameForID) {
 
 
 function graphButtonClick(e, type) { // when user clicks "View as Graph"
-
     if (type == "documentScore") {  // there is only one document scores graph
         if (id("corpusScoresGraph").style.display == "none") { // if graph view is hidden, display it
             id("corpusScoresGraph").style.display = "flex";
@@ -213,12 +244,9 @@ function graphButtonClick(e, type) { // when user clicks "View as Graph"
             id(fileName + "scoredTokensTable").style.display = "none";
         }
     }
-
-
 }
 
 function tableButtonClick(e, type) { // when user clicks "View as Table"
-
     if (type == "documentScore") { // there is only one document scores graph
         if (id("corpusScoresGraph").style.display != "none") { // if graph view is visible, hide it
             id("corpusScoresGraph").style.display = "none";
@@ -242,10 +270,13 @@ function createTableVerOfTokenGraph(scoresCounts) {
     let table = createTableWithHeadings(["Score", "Number of Words With That Score"]);
 
     let tableBody = gen("tbody");
-    for (let i = 0; i < Object.keys(scoresCounts).length; i++) {
+
+    let sortedKeys = Object.keys(scoresCounts).sort((a, b) => {return a - b})
+
+    for (let i = 0; i < sortedKeys.length; i++) {
         let rowContainer = gen("tr");
-        let score = Object.keys(scoresCounts)[i];
-        let count = Object.values(scoresCounts)[i];
+        let score = sortedKeys[i];
+        let count = scoresCounts[score];
 
         let scoreCell = gen("td");
         scoreCell.textContent = score;
@@ -298,10 +329,6 @@ function createTableVerOfDocumentScoresGraph(documentScores) {
 }
 
 
-
-
-
-
 function createTableWithHeadings(listOfHeadings) {
     let table = gen("table");
     let tableHeading = gen("thead");
@@ -319,28 +346,58 @@ function createTableWithHeadings(listOfHeadings) {
     return table;
 }
 
-// function createTableBody(numRows, cellData) {
-//     let tableBody = gen("tbody");
-//     for (let i = 0; i < numRows; i++) {
-//         let rowContainer = gen("tr");
 
 
 
+function createExtremeValueDescriptionOfCorpusOverview (descriptor, extremeXLabel, extremeYLabel, extremeX, extremeY) {
+    // for describing the maximum and minimum scores and percent tokens scored, along with corresponding documents, for the corpus overview graph - text is used in ARIA label, which is read out to screen readers to make graphs more accessible for non-sighted users
+    // descriptor is "highest" or "lowest", in accordance with if it's describing the maximum or minimum value
+    let text = "";
+
+    if (extremeXLabel == extremeYLabel) {
+        text = "The document with the " + descriptor + " score is the same as the one with the " + descriptor + " percentage of tokens scored, which was " + extremeXLabel + ", with a score of " + extremeX + " and a percentage of tokens scored of " + extremeY + ".";
+    } else {
+        text = "The document with the " + descriptor + " score was " + extremeXLabel + ", with a score of " + extremeX + ". The document with the  " + descriptor + " percentage of tokens scored was " + extremeYLabel + ", with a percentage scored of " + extremeY + ".";
+    }
+    return text;
+}
 
 
+function createMaxMinDescriptionOfScoresGraphs(scoresCounts) {
+    let highestCount = Math.max(...Object.values(scoresCounts));;
+    // let highestCountLabel = Math.max(...Object.keys(scoresCounts));
+    let lowestCount = Math.min(...Object.values(scoresCounts));
+    // let lowestCountLabel = Math.min(...Object.keys(scoresCounts));
 
-//         let score = Object.keys(scoresCounts)[i];
-//         let count = Object.values(scoresCounts)[i];
+    let highestCountLabels = [];
+    let lowestCountLabels = [];
 
-//         let scoreCell = gen("td");
-//         scoreCell.textContent = score;
-//         rowContainer.appendChild(scoreCell);
+    for (let i = 0; i < Object.keys(scoresCounts).length; i++) {
+        let currScore = Object.keys(scoresCounts)[i];
+        let currCount = scoresCounts[currScore]
+        if (currCount == highestCount) {
+            highestCountLabels.push(currScore);
+        } else if (currCount == lowestCount) {
+            lowestCountLabels.push(currScore);
+        }
+    }
 
-//         let countCell = gen("td");
-//         countCell.textContent = count;
-//         rowContainer.appendChild(countCell)
+    let maxText = "";
+    let minText = "";
 
-//         tableBody.appendChild(rowContainer);
-//     }
-//     return tableBody;
-// }
+    if (highestCountLabels.length == 1) {
+        maxText = "The score with the highest count was " + highestCountLabels + ", with " + highestCount + " occurrences.";
+    } else {
+        maxText = "There were " + highestCountLabels.length + " scores that had the highest count, with " + highestCount + " occurrences. Those scores were " + highestCountLabels.join(', ') + ".";
+    }
+
+    if (lowestCountLabels.length == 1) {
+        minText = "The score with the lowest count was " + lowestCountLabels + ", with " + lowestCount + " occurrences.";
+    } else {
+        minText = "There were " + lowestCountLabels.length + " scores that had the lowest count, with " + lowestCount + " occurrences. Those scores were " + lowestCountLabels.join(', ') + ".";
+    }
+
+    let text = [maxText, minText].join(' ')
+
+    return text;
+}
