@@ -1,9 +1,8 @@
 import { id, gen } from './utils.js';
-// import * as Tone from "tone";
+// import { playGraph } from './sonification.js';
 
 export function graphTokenScores(location, scoredWords, fileName) {
 
-    let graphContainer = createGraphContainer("tokenScore", fileName);
     let graph = gen("div");
     graph.classList.add("scoredTokensGraph");
     graph.id = fileName + "scoredTokensGraph";
@@ -58,6 +57,8 @@ export function graphTokenScores(location, scoredWords, fileName) {
 
     graph.ariaLabel = "Graph. A bar plot of the count of various scores in the document. Score is on the x-axis, from negative 6 to 6, and count is on the y-axis. There are " + Object.keys(scoresCounts).length + " bars. " + minMaxText;
 
+
+    let graphContainer = createGraphContainer("tokenScore", fileName, Object.keys(scoresCounts), Object.values(scoresCounts));
     graphContainer.appendChild(graph);
 
     let tableView = createTableVerOfTokenGraph(scoresCounts);
@@ -73,7 +74,6 @@ export function graphTokenScores(location, scoredWords, fileName) {
 
 
 export function graphDocumentScores(documentScores, location) {
-    let graphContainer = createGraphContainer("documentScore", "documentScore");
     let graph = gen("div");
     graph.id = "corpusScoresGraph";
     graph.role = "img";
@@ -150,6 +150,8 @@ export function graphDocumentScores(documentScores, location) {
 
     graph.ariaLabel = "Graph. A scatterplot of document scores by the percentage of terms in the file that were scored. Score is on the x-axis, from negative 1 to 1, and percentage terms scored is on the y-axis, from 0 to " + String(Math.max(...yPoints) + 1) + ". " + maxPointText + " " +  minPointText;
 
+
+    let graphContainer = createGraphContainer("documentScore", "documentScore", xPoints, yPoints);
     graphContainer.appendChild(graph);
 
     let tableView = createTableVerOfDocumentScoresGraph(documentScores);
@@ -163,7 +165,7 @@ export function graphDocumentScores(documentScores, location) {
 
 
 
-function createGraphContainer(type, nameForID) {
+function createGraphContainer(type, nameForID, xData, yData) {
     let graphContainer = gen("div");
     graphContainer.classList.add("graphContainer");
     graphContainer.id = nameForID + "_graphContainer";
@@ -198,9 +200,10 @@ function createGraphContainer(type, nameForID) {
     graphOptionsButtonsContainer.appendChild(tableButton);
 
 
-    let playButton = gen("button");
-    playButton.textContent = "Hear Graph";
-    playButton.id = nameForID + "_playGraph";
+    // code to do with sonification - lacked time to finish
+    // let playButton = gen("button");
+    // playButton.textContent = "Hear Graph";
+    // playButton.id = nameForID + "_playGraph";
 
     // function playNote() {
     //     const synth = new Tone.Synth().toDestination();
@@ -208,19 +211,19 @@ function createGraphContainer(type, nameForID) {
     // }
     // playButton.addEventListener("click", playNote);
 
-    async function playGraph() {
-        await Tone.start()
-        console.log("audio is ready")
-        // const synth = new Tone.Synth().toDestination();
-        const osc = new Tone.Oscillator().toDestination();
-        osc.frequency.value = "C4"; // start at "C4"
-        osc.frequency.rampTo("C2", 2); // ramp to "C2" over 2 seconds
-        osc.start().stop("+3"); // start the oscillator for 2 seconds
-    }
-    playButton.addEventListener("click", async() => { await playGraph() })
+    // async function playGraph() {
+    //     await Tone.start()
+    //     console.log("audio is ready")
+    //     // const synth = new Tone.Synth().toDestination();
+    //     const osc = new Tone.Oscillator().toDestination();
+    //     osc.frequency.value = "C4"; // start at "C4"
+    //     osc.frequency.rampTo("C2", 2); // ramp to "C2" over 2 seconds
+    //     osc.start().stop("+3"); // start the oscillator for 2 seconds
+    // }
+    // playButton.addEventListener("click", async() => { await playGraph(xData, yData) })
 
 
-    graphOptionsButtonsContainer.appendChild(playButton);
+    // graphOptionsButtonsContainer.appendChild(playButton);
 
     graphOptionsContainer.appendChild(graphOptionsButtonsContainer);
     graphContainer.appendChild(graphOptionsContainer);
@@ -365,9 +368,7 @@ function createExtremeValueDescriptionOfCorpusOverview (descriptor, extremeXLabe
 
 function createMaxMinDescriptionOfScoresGraphs(scoresCounts) {
     let highestCount = Math.max(...Object.values(scoresCounts));;
-    // let highestCountLabel = Math.max(...Object.keys(scoresCounts));
     let lowestCount = Math.min(...Object.values(scoresCounts));
-    // let lowestCountLabel = Math.min(...Object.keys(scoresCounts));
 
     let highestCountLabels = [];
     let lowestCountLabels = [];
