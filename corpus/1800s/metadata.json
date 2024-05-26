@@ -12,5 +12,12 @@
         "publishing_year": "1895",
         "publisher": "Smith, Elder, & Company",
         "link": "https://www.google.com/books/edition/Jane_Eyre/2O8mAQAAIAAJ?hl=en&gbpv=0"
+    },
+    "wuthering_heights.txt": {
+        "title": "Wuthering Heights",
+        "author": "Emily Bronte",
+        "publishing_year": "1858",
+        "publisher": "Harper & Brothers, publishers, Franklin square",
+        "link": "https://www.google.com/books/edition/Wuthering_Heights/KhMYAAAAYAAJ?hl=en&gbpv=0"
     }
 }
