@@ -15,7 +15,8 @@ const AFINN_LINK = "lexicons/afinn-lexicon-en-165.txt";
 const HISTORICAL_LINK = "lexicons/lexicon-v1.txt";
 
 const NLTK_STOPWORDS_LINK = "stop_words_lists/nltk_stop_words.txt";
-const TOOL_STOPWORDS_LINK = "stop_words_lists/custom_stop_words.txt";
+const TOOL_STOPWORDS_LINK = "stop_words_lists/tool_stop_words.txt";
+
 
 let AFINN_obj = {};
 let historicalLexiconObj = {};
@@ -65,6 +66,9 @@ function init() {
     // finding lexicon option checkboxes and adding event listeners to them
     let lexiconOptions = document.querySelectorAll('input[name=lexicon]');
     lexiconOptions.forEach((e) => e.addEventListener("change", updateSelectedLexicons));
+
+    let stopwordsOptions = document.querySelectorAll('input[name=stopwords]');
+    stopwordsOptions.forEach((e) => e.addEventListener("change", updateSelectedStopwords));
 
     id("lexicon3").addEventListener("change", function() { toggleElementVisibility("customLexiconSection", "flex"); });
     id("stopwords3").addEventListener("change", function() { toggleElementVisibility("customStopwordsSection", "flex"); });
@@ -383,6 +387,14 @@ function makeFullLexicon() {
 }
 
 
+
+function updateSelectedStopwords() {
+    let checkedBoxes = document.querySelectorAll('input[name=stopwords]:checked');
+    let selectedStopwords = [];
+    checkedBoxes.forEach((e) => selectedStopwords.push(e.value));
+
+    currentStopwords = selectedStopwords;
+}
 
 function makeFullStopwordsList() {
     let fullStopwordsList = []
