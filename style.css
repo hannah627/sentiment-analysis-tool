@@ -1,3 +1,11 @@
+.hover-link {
+    color: #363636;
+    font-weight: bold;
+}
+
+
+
+
 /* colors */
 .toolTip .toolTipText,
 .scoredWord .toolTipText {
