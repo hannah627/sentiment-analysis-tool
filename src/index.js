@@ -172,8 +172,8 @@ function processInputtedTextFile(e) {
     let userContinuing = true;
 
     // limit the maximum number of files that will be processed, or at least give a warning about bad performance
-    if (files.length > 50) {
-        userContinuing = window.confirm("Uploading a lot of files may decrease performance/make the tool run slower. You might want to try again and upload less files, or you can keep going, but be aware that it may take longer than usual to finish. What would you like to do?");
+    if (files.length > 100) {
+        userContinuing = window.confirm("Uploading a lot of files may decrease performance/make the tool run slower. You might want to try again and upload less files, or you can keep going, but be aware that it may take longer than usual to finish. Would you like to continue?");
     }
 
     if (userContinuing) {
@@ -230,10 +230,14 @@ function onLoadEndHandler(numFiles) {
 
         graphDocumentScores(documentScores, resultsSection);
 
-        let corpusResultsText = gen("p");
-        let toolTip = "<span class='toolTip'>corpus score<span class='toolTipText'>The average of each document's comparative score</span></span>";
+        let corpusResultsSection = gen("section");
+        corpusResultsSection.classList.add("subSection");
+        corpusResultsSection.classList.add("centerText");
+        let corpusResultsText = gen("h3");
+        let toolTip = "<span class='toolTip'>Corpus Score<span class='toolTipText'>The average of each document's comparative score</span></span>";
         corpusResultsText.innerHTML = "Overall " + toolTip + ": " + (totalCorpusScore / numFiles).toFixed(3);
-        resultsSection.prepend(corpusResultsText);
+        corpusResultsSection.appendChild(corpusResultsText);
+        resultsSection.prepend(corpusResultsSection);
 
         id("multipleInputsResultsSection").scrollIntoView({behavior: 'smooth'});
     };
@@ -508,11 +512,23 @@ function returnFullText(text, textSection, scoredWords) {
                 currentWordToken = "not " + currentWordToken;
 
                 if (currentWordToken == currentToken) {
-                    textSectionContent.pop(); // remove the last part of the textSectionContent array so that "not" isn't there twice
-                    copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
+                    if (fullTextTokens[i - 1] == "not") { // need to check b/c sometimes currentToken = "not pay" but text = "not to pay"
+                        textSectionContent.pop(); // remove the last part of the textSectionContent array so that "not" isn't there twice
+                        currentWord = "not " + currentWord;
 
-                    currentWord = fullTextTokens[i - 1] + " " + currentWord;
+                    } else if ((fullTextTokens[i - 2] == "not") && (fullTextTokens[i - 1] == "to")) {
+                        textSectionContent.pop();
+                        textSectionContent.pop(); // do twice to remove "not" and "to" from textSectionContent, so they don't appear twice
+                        currentWord = "not to " + currentWord;
+
+                    } else {
+                        // this means there were likely multiple words cut from between "not" and second term (i.e. stop words), and so "not" shouldn't actually be affecting that second term
+                        let oldScore = copyScoredWords[0].score;
+                        copyScoredWords[0].score = -1 * oldScore; // undoing the sign change that "not" gives to scores
+                    }
+
                     toAppend = createScoredWordToolTip(currentWord, copyScoredWords[0]);
+                    copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
                 }
 
             } else if (currentWordToken == currentToken) {
@@ -520,7 +536,7 @@ function returnFullText(text, textSection, scoredWords) {
                 copyScoredWords.splice(0, 1); // remove current token from scoredWords list, so it goes faster
             }
         }
-        textSectionContent.push(toAppend);
+        textSectionContent.push(toAppend); // regardless of if word has score or not, we need to add it to the full text
     }
     textSection.innerHTML = textSectionContent.join(' ');
 }

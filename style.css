@@ -215,6 +215,11 @@ article > section {
 }
 
 
+.centerText {
+    text-align: center;
+}
+
+
 .explanationSubSections {
     padding: 10px;
     border-radius: 10px;
